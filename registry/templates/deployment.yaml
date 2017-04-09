@@ -1,0 +1,59 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: {{ template "fullname" . }}
+  labels:
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
+spec:
+  replicas: {{ .Values.replicaCount }}
+  template:
+    metadata:
+      annotations:
+        pod.alpha.kubernetes.io/init-containers: '[
+            {
+                "name": "subst-config-secrets",
+                "image": "{{ .Values.containers.cfssl.image.repository }}:{{ .Values.containers.cfssl.image.tag }}",
+                "imagePullPolicy": "{{ .Values.containers.cfssl.image.pullPolicy }}",
+                "command": ["/secrets-conversion/init.sh"],
+                "workingDir": "/initial-certificate-store",
+                "volumeMounts": [
+                  {
+                    "name": "secrets-conversion",
+                    "mountPath": "/secrets-conversion"
+                  },
+                  {
+                    "name": "config",
+                    "mountPath": "/config"
+                  }
+                ]
+            }
+        ]'
+      labels:
+        app: {{ template "fullname" . }}
+    spec:
+      containers:
+      - name: {{ .Chart.Name }}
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        ports:
+        - containerPort: {{ .Values.service.internalPort }}
+        livenessProbe:
+          httpGet:
+            path: /
+            port: {{ .Values.service.internalPort }}
+        readinessProbe:
+          httpGet:
+            path: /
+            port: {{ .Values.service.internalPort }}
+        resources:
+{{ toYaml .Values.resources | indent 12 }}
+      volumes:
+        name: secrets-conversion
+        configMap:
+          name: {{ template "fullname" . }}
+          defaultMode: 0755
+          items:
+          - key: init.sh
+            path: init.sh
+          - key: config.yml.tmpl
+            path: config.yml.tmpl

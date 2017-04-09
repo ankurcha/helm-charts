@@ -1,0 +1,59 @@
+# Default values for kubedns.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+replicaCount: 1
+kubecontext: cluster
+containers:
+  dnsmasq:
+    image:
+      repository: gcr.io/google_containers/kube-dnsmasq-amd64
+      tag: 1.4
+      pullPolicy: IfNotPresent
+  kubedns:
+    image:
+      repository: gcr.io/google_containers/kubedns-amd64
+      tag: 1.9
+      pullPolicy: IfNotPresent
+  sidecar:
+    image:
+      repository: gcr.io/google_containers/k8s-dns-sidecar-amd64
+      tag: 1.10.0
+      pullPolicy: IfNotPresent
+resources:
+  dnsmasq:
+    limits:
+      cpu: 100m
+      memory: 256Mi
+    requests:
+      cpu: 100m
+      memory: 32Mi
+  kubedns:
+    limits:
+      cpu: 100m
+      memory: 170Mi
+    requests:
+      cpu: 100m
+      memory: 70Mi
+  sidecar:
+    limits:
+      cpu: 100m
+      memory: 100Mi
+    requests:
+      cpu: 100m
+      memory: 10Mi
+monitoring:
+  probe_services: true
+alerting:
+  chat_channels: alerts
+  paging_profiles: 24x7
+metrics:
+  scrape_prometheus: true
+  prometheus_port: 9145
+services:
+  kubedns:
+    type: ClusterIP
+    externalPort: 53
+    internalPort: 53
+persistence:
+secretsRef: "__required__"
+clusterIP: 10.0.0.10

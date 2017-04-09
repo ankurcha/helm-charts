@@ -1,0 +1,49 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    app: postgresql
+    service: database
+  name: database
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgresql
+      service: database
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: postgresql
+        service: database
+    spec:
+      containers:
+      - name: database
+        image: "{{ .Values.containers.postgresql.image.repository }}:{{ .Values.containers.postgresql.image.tag }}"
+        imagePullPolicy: {{ .Values.containers.postgresql.image.pullPolicy | quote }}
+        env:
+        - name: POSTGRES_USER
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.secretsRef }}
+              key: postgres-user
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.secretsRef }}
+              key: postgres-password
+        ports:
+        - containerPort: 5432
+          name: database
+          protocol: TCP
+      terminationGracePeriodSeconds: 90
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: database-dbdata

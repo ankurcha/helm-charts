@@ -1,0 +1,10 @@
+Services available:
+
+1. Kibana WebUI:
+- https://kibana-logging.{{ .Release.Namespace }}.svc.{{ .Values.context }}.local:{{ .Values.services.kibana.externalPort }}
+
+2. Nginx Prometheus-compatible ping server:
+- https://kibana-logging.{{ .Release.Namespace }}.svc.{{ .Values.context }}.local:{{ .Values.services.nginx.externalPort }}/ping
+
+3. Nginx Prometheus-compatible metrics servers:
+- https://$POD_IP:{{ .Values.services.metrics.internalPort }}/metrics

@@ -1,0 +1,32 @@
+# Default values for namespaces.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+limits:
+  container:
+    default:
+      cpu: 300m
+      memory: 200Mi
+    defaultRequest:
+      cpu: 200m
+      memory: 200Mi
+    max:
+      cpu: "2"
+      memory: "3Gi"
+    min:
+      cpu: 100m
+      memory: 3Mi
+    maxLimitRequestRatio:
+      cpu: "10"
+      memory: "10"
+  pod:
+    max:
+      cpu: "2"
+      memory: 16Gi
+    min:
+      cpu: 200m
+      memory: 6Mi
+  pvc:
+    max:
+      storage: 2Ti
+    min:
+      storage: 10Mi

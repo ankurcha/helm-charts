@@ -1,0 +1,10 @@
+apiVersion: v1
+description: A Helm chart for Kubernetes
+name: kubedns
+version: 0.1.14
+home: https://charts.helm.svc.downup.local/kubedns
+maintainers:
+- email: shane.ramey@gmail.com
+  name: Shane Ramey
+sources:
+- https://github.com/kubernetes/kubernetes/tree/master/cluster/addons/dns

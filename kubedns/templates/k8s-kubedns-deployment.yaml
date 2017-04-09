@@ -1,0 +1,116 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: kubedns
+  labels:
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+spec:
+  replicas: {{ .Values.replicaCount }}
+  template:
+    metadata:
+      annotations:
+        alert-chat-channels: {{ .Values.alerting.chat_channels | quote }}
+        alert-paging-profiles: {{ .Values.alerting.paging_profiles | quote }}
+      labels:
+        chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+        app: {{ template "fullname" . }}
+        service: kubedns
+    spec:
+      dnsPolicy: Default  # Don't use cluster DNS.
+      containers:
+      - name: dnsmasq
+        image: "{{ .Values.containers.dnsmasq.image.repository }}:{{ .Values.containers.dnsmasq.image.tag }}"
+        imagePullPolicy: {{ .Values.containers.dnsmasq.image.pullPolicy }}
+        args:
+        - --cache-size=1000
+        - --no-resolv
+        - --server=/{{ .Values.kubecontext }}.local/127.0.0.1#10053
+        - --server=8.8.8.8
+        - --server=8.8.4.4
+        - --log-facility=-
+        ports:
+        - containerPort: {{ .Values.services.kubedns.internalPort }}
+          name: dns
+          protocol: UDP
+        - containerPort: {{ .Values.services.kubedns.internalPort }}
+          name: dns-tcp
+          protocol: TCP
+        - containerPort: 9091
+          name: metrics
+          protocol: TCP
+        livenessProbe:
+          httpGet:
+            path: /healthcheck/dnsmasq
+            port: 10054
+            scheme: HTTP
+          initialDelaySeconds: 60
+          timeoutSeconds: 5
+          successThreshold: 1
+          failureThreshold: 5
+        resources:
+{{ toYaml .Values.resources.dnsmasq | indent 12 }}
+      - name: kubedns
+        image: "{{ .Values.containers.kubedns.image.repository }}:{{ .Values.containers.kubedns.image.tag }}"
+        imagePullPolicy: {{ .Values.containers.kubedns.image.pullPolicy }}
+        livenessProbe:
+          httpGet:
+            path: /healthcheck/kubedns
+            port: 10054
+            scheme: HTTP
+          initialDelaySeconds: 60
+          timeoutSeconds: 5
+          successThreshold: 1
+          failureThreshold: 5
+        readinessProbe:
+          httpGet:
+            path: /readiness
+            port: 8081
+            scheme: HTTP
+          # we poll on pod startup for the Kubernetes master service and
+          # only setup the /readiness HTTP server once that's available.
+          initialDelaySeconds: 3
+          timeoutSeconds: 5
+        env:
+          - name: "PROMETHEUS_PORT"
+            value: "9145"
+        args:
+        # command = "/kube-dns"
+        - --domain={{ .Values.kubecontext }}.local
+        - --dns-port=10053
+        - --config-map=kube-dns
+        - --v=2
+        ports:
+        - containerPort: 10053
+          name: dns-local
+          protocol: UDP
+        - containerPort: 10053
+          name: dns-tcp-local
+          protocol: TCP
+        - containerPort: 9145
+          name: metrics
+          protocol: TCP
+        resources:
+{{ toYaml .Values.resources.kubedns | indent 12 }}
+      - name: sidecar
+        image: "{{ .Values.containers.sidecar.image.repository }}:{{ .Values.containers.sidecar.image.tag }}"
+        imagePullPolicy: {{ .Values.containers.sidecar.image.pullPolicy }}
+        livenessProbe:
+          httpGet:
+            path: /metrics
+            port: 10054
+            scheme: HTTP
+          initialDelaySeconds: 60
+          timeoutSeconds: 5
+          successThreshold: 1
+          failureThreshold: 5
+        args:
+        - --v=2
+        - --logtostderr
+        - --probe=kubedns,127.0.0.1:10053,kubernetes.default.svc.{{ .Values.kubecontext }}.local,5,A
+        - --probe=dnsmasq,127.0.0.1:53,kubernetes.default.svc.{{ .Values.kubecontext }}.local,5,A
+        ports:
+        - containerPort: 10054
+          name: metrics
+          protocol: TCP
+        resources:
+{{ toYaml .Values.resources.sidecar | indent 12 }}

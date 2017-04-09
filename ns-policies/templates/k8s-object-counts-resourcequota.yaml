@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: object-counts
+spec:
+  hard:
+    configmaps: "4000" # The total number of ConfigMap objects that can exist in the project.
+    persistentvolumeclaims: "10" # The total number of persistent volume claims (PVCs) that can exist in the project.
+    replicationcontrollers: "8" # The total number of replication controllers that can exist in the project.
+    resourcequotas: "20" # The total number of resource quotas that can exist in the project.
+    secrets: "10" # The total number of secrets that can exist in the project.
+    services: "5" # The total number of secrets that can exist in the project.

@@ -1,0 +1,58 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: migrate
+spec:
+  template:
+    metadata:
+      name: migrate
+      annotations:
+        checksum/migrate-init: {{ include "cfssl/templates/migrate-init-configmap.yaml" . | sha256sum }}
+        checksum/goose-config: {{ include "cfssl/templates/migrate-dbconf-template-configmap.yaml" . | sha256sum }}
+        checksum/goose-migrations: {{ include "cfssl/templates/database-migrations-configmap.yaml" . | sha256sum }}
+    spec:
+      containers:
+      - name: initdb
+        image: "{{ .Values.containers.cfssl.image.repository }}:{{ .Values.containers.cfssl.image.tag }}"
+        imagePullPolicy: {{ .Values.containers.cfssl.image.pullPolicy }}
+        command: ["sleep"]
+        args: ["99999999"]
+        env:
+          - name: DATABASE_USERNAME
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.secretsRef }}
+                key: postgres-user
+          - name: DATABASE_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.secretsRef }}
+                key: postgres-password
+        volumeMounts:
+          - name: init
+            mountPath: /goose-init-template/
+          - name: dbconf-template
+            mountPath: /goose-config/
+          - name: db-migrations
+            mountPath: /goose-config/migrations
+      volumes:
+        - name: init
+          configMap:
+            name: migrate-init
+            defaultMode: 0755
+            items:
+            - key: init.sh
+              path: init.sh
+        - name: dbconf-template
+          configMap:
+            name: migrate-dbconf-template
+            items:
+            - key: dbconf-template.yml
+              path: dbconf-template.yml
+        - name: db-migrations
+          configMap:
+            name: database-migrations
+            items:
+            - key: 001_CreateCertificates.sql
+              path: 001_CreateCertificates.sql
+      restartPolicy: Never

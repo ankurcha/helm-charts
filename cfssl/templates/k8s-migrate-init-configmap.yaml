@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: migrate-init
+data:
+  init.sh: |
+    #! /bin/sh
+    # substitute secrets in db DSN
+    mkdir /goose-init
+    sed -e 's/__POSTGRES_DATABASE_USER__/$DATABASE_USERNAME/g' /goose-config/dbconf-template.yml > /goose-init/dbconf.yaml
+    sed -ie 's/__POSTGRES_DATABASE_PASSWORD__/$DATABASE_PASSWORD/g' /goose-init/dbconf.yaml
+    chmod +x /goose-init/dbconf.yaml
+    # get goose, then run it
+    /usr/local/go/bin/go get -u bitbucket.org/liamstask/goose/cmd/goose
+    cp -r $GOPATH/src/github.com/cloudflare/cfssl/certdb/pg/migrations /goose-config/
+    /go/bin/goose -env deploy -path /goose-config/ up

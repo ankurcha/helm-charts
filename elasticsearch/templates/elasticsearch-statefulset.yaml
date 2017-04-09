@@ -1,0 +1,95 @@
+apiVersion: apps/v1beta1
+kind: StatefulSet
+metadata:
+  name: elasticsearch-logging
+  labels:
+    app: elasticsearch-logging
+    service: elasticsearch-logging
+    kubernetes.io/cluster-service: "true"
+spec:
+  serviceName: "elasticsearch-logging"
+  replicas: {{ .Values.replicaCount }}
+  template:
+    metadata:
+      labels:
+        chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+        app: {{ .Chart.Name }}
+        service: elasticsearch-logging
+    spec:
+      containers:
+      - name: elasticsearch-logging
+        image: "{{ .Values.containers.elasticsearch.image.repository }}:{{ .Values.containers.elasticsearch.image.tag }}"
+        imagePullPolicy: {{ .Values.containers.elasticsearch.image.pullPolicy }}
+        ports:
+        - name: db
+          containerPort: {{ .Values.services.elasticsearch.internalPort }}
+          protocol: TCP
+        - name: transport
+          containerPort: {{ .Values.services.estransport.internalPort }}
+          protocol: TCP
+        volumeMounts:
+        - name: es-persistent-storage
+          mountPath: /data
+        resources:
+          limits:
+            cpu: {{ .Values.containers.elasticsearch.resources.limits.cpu }}
+            memory: {{ .Values.containers.elasticsearch.resources.limits.memory }}
+          requests:
+            cpu: {{ .Values.containers.elasticsearch.resources.requests.cpu }}
+            memory: {{ .Values.containers.elasticsearch.resources.requests.memory }}
+      - name: nginx
+        image: "{{ .Values.containers.nginx.image.repository }}:{{ .Values.containers.nginx.image.tag }}"
+        imagePullPolicy: {{ .Values.containers.nginx.image.pullPolicy }}
+        livenessProbe:
+          httpGet:
+            path: /ping
+            port: {{ .Values.services.nginx.internalPort }}
+            scheme: HTTPS
+          initialDelaySeconds: 30
+          timeoutSeconds: 30
+        ports:
+        - name: https
+          containerPort: {{ .Values.services.nginx.internalPort }}
+          protocol: TCP
+        - name: metrics
+          containerPort:  {{ .Values.services.metrics.internalPort }}
+          protocol: TCP
+        resources:
+          limits:
+            cpu: {{ .Values.containers.nginx.resources.limits.cpu }}
+            memory: {{ .Values.containers.nginx.resources.limits.memory }}
+          requests:
+            cpu: {{ .Values.containers.nginx.resources.requests.cpu }}
+            memory: {{ .Values.containers.nginx.resources.requests.memory }}
+        volumeMounts:
+        - mountPath: /etc/nginx/ssl
+          name: tls
+          readOnly: true
+        - mountPath: /etc/nginx/sites-enabled
+          name: nginx-config
+          readOnly: true
+      volumes:
+      - name: tls
+        secret:
+          secretName: elasticsearch-nginx-tls
+          items:
+          - key: certificate.crt
+            path: certificate.crt
+          - key: certificate.key
+            path: certificate.key
+      - name: nginx-config
+        configMap:
+          name: elasticsearch-nginx
+          items:
+          - key: nginx-site
+            path: default
+  volumeClaimTemplates:
+  - metadata:
+      name: es-persistent-storage
+      annotations:
+        volume.beta.kubernetes.io/storage-class: {{ .Values.persistence.pv1.storageClass }}
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 64Gi

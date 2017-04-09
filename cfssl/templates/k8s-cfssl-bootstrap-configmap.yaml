@@ -1,0 +1,40 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cfssl-bootstrap
+data:
+  init.sh: |
+    #! /bin/sh
+    # initialize Root + Intermediate CA certificates if no files exist in CA directory
+    if [ "$(ls -A /initial-certificate-store)" ]; then
+      exit 0 # CA cert has already been initialized
+    else
+      /go/bin/cfssl gencert \
+        -initca /etc/cfssl-bootstrap/root-ca.json \
+        | /go/bin/cfssljson -bare root_ca
+
+      /go/bin/cfssl gencert \
+        -initca /etc/cfssl-bootstrap/intermediate-ca.json \
+        | /go/bin/cfssljson -bare intermediate_ca
+
+      /go/bin/cfssl sign \
+        -ca root_ca.pem -ca-key root_ca-key.pem \
+        -config /etc/cfssl-bootstrap/signing-profiles.json \
+        -profile int \
+        intermediate_ca.csr | cfssljson -bare intermediate_ca
+
+      /go/bin/mkbundle -f int-bundle.crt intermediate_ca.pem
+
+      /go/bin/mkbundle -f ca-bundle.crt root_ca.pem
+
+      cat intermediate_ca.pem root_ca.pem > chain.crt
+
+      /go/bin/cfssl gencert \
+        -ca intermediate_ca.pem -ca-key intermediate_ca-key.pem \
+        -config /etc/cfssl-bootstrap/signing-profiles.json \
+        -profile server \
+        /etc/cfssl-bootstrap/server_csr.json | /go/bin/cfssljson -bare http
+
+      cat http.pem intermediate_ca.pem root_ca.pem > http-certificate.pem
+      cp http-key.pem http-certificate-key.pem
+    fi

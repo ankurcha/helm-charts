@@ -1,0 +1,12 @@
+If you set defaultStorageClass: true in values.yaml, then PersistentVolumes
+will be provisioned dynamically without any configuration of the PersistentVolumeClaim.
+
+Otherwise, specify:
+
+  annotations:
+    volume.beta.kubernetes.io/storage-class: nfs
+
+in your PersistentVolumeClaim's metadata.
+
+WARNING
+  this provides an nfs v3 server that doesn't use authentication!!

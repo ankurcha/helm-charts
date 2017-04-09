@@ -1,0 +1,41 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: kibana-logging
+  labels:
+    app: kibana-logging
+    service: http
+    kubernetes.io/cluster-service: "true"
+    addonmanager.kubernetes.io/mode: Reconcile
+  annotations:
+    alert-chat-channels: {{ .Values.alerting.chat_channels | quote }}
+    alert-paging-profiles: {{ .Values.alerting.paging_profiles | quote }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: kibana-logging
+      service: http
+  template:
+    metadata:
+      labels:
+        app: kibana-logging
+        service: http
+    spec:
+      containers:
+      - name: kibana-logging
+        image:  "{{ .Values.containers.kibana.image.repository }}:{{ .Values.containers.kibana.image.tag }}"
+        resources:
+          limits:
+            cpu:  {{ .Values.containers.kibana.resources.limits.cpu }}
+            memory: {{ .Values.containers.kibana.resources.limits.memory }}
+          requests:
+            cpu:  {{ .Values.containers.kibana.resources.requests.cpu }}
+            memory: {{ .Values.containers.kibana.resources.requests.memory }}
+        env:
+          - name: "ELASTICSEARCH_URL"
+            value: "http://elasticsearch-logging:9200"
+        ports:
+        - containerPort: {{ .Values.services.kibana.internalPort }}
+          name: ui
+          protocol: TCP

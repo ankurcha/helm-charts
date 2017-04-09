@@ -1,0 +1,30 @@
+Namespace {{.Release.Namespace}} has limits:
+
+container:
+  default:
+    cpu: {{.Values.limits.container.default.cpu}}
+    memory: {{.Values.limits.container.default.memory}}
+  defaultRequest:
+    cpu: {{.Values.limits.container.defaultRequest.cpu}}
+    memory: {{.Values.limits.container.defaultRequest.memory}}
+  max:
+    cpu: {{.Values.limits.container.max.cpu}}
+    memory: {{.Values.limits.container.max.memory}}
+  min:
+    cpu: {{.Values.limits.container.min.cpu}}
+    memory: {{.Values.limits.container.min.memory}}
+  maxLimitRequestRatio:
+    cpu: {{.Values.limits.container.maxLimitRequestRatio.cpu}}
+    memory: {{.Values.limits.container.maxLimitRequestRatio.memory}}
+pod:
+  max:
+    cpu: {{.Values.limits.pod.max.cpu}}
+    memory: {{.Values.limits.pod.max.memory}}
+  min:
+    cpu: {{.Values.limits.pod.min.cpu}}
+    memory: {{.Values.limits.pod.min.memory}}
+pvc:
+  max:
+    storage: {{.Values.limits.pvc.max.storage}}
+  min:
+    storage: {{.Values.limits.pvc.min.storage}}

@@ -1,0 +1,2 @@
+1. Services available:
+dns://kubedns.{{ .Release.Namespace }}.svc.{{ .Values.context }}.local:{{ .Values.services.kubedns.externalPort }}

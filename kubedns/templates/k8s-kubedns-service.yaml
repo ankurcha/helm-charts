@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: kubedns
+  annotations:
+    prometheus.io/probe: {{ .Values.monitoring.probe_services | quote }}
+    alert-chat-channels: {{ .Values.alerting.chat_channels | quote }}
+    alert-paging-profiles: {{ .Values.alerting.paging_profiles | quote }}
+  labels:
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    app: {{ .Chart.Name }}
+    service: dns
+spec:
+  type: {{ .Values.services.kubedns.type | quote }}
+  clusterIP: {{ .Values.dnsServiceIP | quote }}
+  ports:
+  - port: {{ .Values.services.kubedns.externalPort }}
+    targetPort: {{ .Values.services.kubedns.internalPort }}
+    protocol: UDP
+    name: dns
+  - port: {{ .Values.services.kubedns.externalPort }}
+    targetPort: {{ .Values.services.kubedns.internalPort }}
+    protocol: TCP
+    name: dns-tcp
+  selector:
+    app: {{ template "fullname" . }}

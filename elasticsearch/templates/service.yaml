@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: elasticsearch-logging
+  annotations:
+    prometheus.io/probe: {{ .Values.monitoring.probe_services | quote }}
+    alert-chat-channels: {{ .Values.alerting.chat_channels | quote }}
+    alert-paging-profiles: {{ .Values.alerting.paging_profiles | quote }}
+  labels:
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    app: {{ .Chart.Name }}
+    service: elasticsearch-logging
+    kubernetes.io/cluster-service: "true"
+spec:
+  type: {{ .Values.services.type }}
+  ports:
+  - name: elasticsearch-logging
+    port: {{ .Values.services.elasticsearch.externalPort }}
+    targetPort: {{ .Values.services.elasticsearch.internalPort }}
+    protocol: TCP
+  - name: http
+    port: {{ .Values.services.nginx.externalPort }}
+    targetPort: {{ .Values.services.nginx.internalPort }}
+    protocol: TCP
+  selector:
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    app: {{ .Chart.Name }}
+    service: elasticsearch-logging

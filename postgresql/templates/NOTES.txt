@@ -1,0 +1,2 @@
+1. Services available:
+psql://database.{{ .Release.Namespace }}.svc.{{ .Values.kubecontext }}.local:{{ .Values.services.db.externalPort }}

@@ -1,0 +1,54 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: helm-chart-publisher-s3
+  labels:
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
+    app: helm-chart-publisher-s3
+    service: http
+spec:
+  replicas: {{ .Values.replicaCount }}
+  template:
+    metadata:
+      labels:
+        chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
+        app: helm-chart-publisher-s3
+        service: http
+    spec:
+      containers:
+      - name: {{ .Chart.Name }}
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        env:
+          - name: ACCESSKEY
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.secretsRef }}
+                key: aws-accesskey
+          - name: SECRETKEY
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.secretsRef }}
+                key: aws-secretkey
+          - name: BUCKET
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.secretsRef }}
+                key: s3-bucket
+          - name: REGION
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.secretsRef }}
+                key: aws-region
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        ports:
+        - containerPort: {{ .Values.service.internalPort }}
+        livenessProbe:
+          httpGet:
+            path: /
+            port: {{ .Values.service.internalPort }}
+        readinessProbe:
+          httpGet:
+            path: /
+            port: {{ .Values.service.internalPort }}
+        resources:
+{{ toYaml .Values.resources | indent 12 }}

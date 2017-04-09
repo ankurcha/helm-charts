@@ -1,0 +1,28 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: nfs-provisioner
+  annotations:
+    prometheus.io/probe: {{ .Values.monitoring.probe_services | quote }}
+    alert-chat-channels: {{ .Values.alerting.chat_channels | quote }}
+    alert-paging-profiles: {{ .Values.alerting.paging_profiles | quote }}
+  labels:
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
+    app: nfs-provisioner
+    service: nfs
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - name: nfs
+      port: 2049
+    - name: mountd
+      port: 20048
+    - name: rpcbind
+      port: 111
+    - name: rpcbind-udp
+      port: 111
+      protocol: UDP
+  selector:
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    app: nfs-provisioner
+    service: nfs

@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: compute-resources
+spec:
+  hard:
+    pods: "4"  # The total number of pods in a non-terminal state that can exist in the project.
+    requests.cpu: "1"  # Across all pods in a non-terminal state, the sum of CPU requests cannot exceed 1 core.
+    requests.memory: 1Gi # Across all pods in a non-terminal state, the sum of memory requests cannot exceed 1Gi.
+    limits.cpu: "2" # Across all pods in a non-terminal state, the sum of CPU limits cannot exceed 2 cores.
+    limits.memory: 2Gi # Across all pods in a non-terminal state, the sum of memory limits cannot exceed 2Gi.
+    #cpu:
+    #memory:

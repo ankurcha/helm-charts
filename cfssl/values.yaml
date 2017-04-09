@@ -1,0 +1,67 @@
+# Default values for cfssl.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+replicaCount: 1
+kubecontext: cluster
+containers:
+  cfssl:
+    image:
+      repository: downup/cfssl
+      tag: 1.2.0
+      pullPolicy: IfNotPresent
+      args:
+        - serve
+  nginx:
+    image:
+      repository: downup/nginx-prom
+      tag: 0.1.0
+      pullPolicy: IfNotPresent
+resources:
+  cfssl:
+    limits:
+      cpu: 100m
+      memory: 32Mi
+    requests:
+      cpu: 10m
+      memory: 8Mi
+  nginx:
+    limits:
+      cpu: 100m
+      memory: 32Mi
+    requests:
+      cpu: 10m
+      memory: 10Mi
+monitoring:
+  probe_services: true
+alerting:
+  chat_channels: alerts
+  paging_profiles: 24x7
+metrics:
+  scrape_prometheus: true
+  prometheus_port: 9145
+services:
+  http:
+    type: ClusterIP
+    externalPort: 443
+    internalPort: 443
+  db:
+    type: ClusterIP
+    externalPort: 5432
+    internalPort: 5432
+persistence:
+  size: 256Mi
+  storageClass: default
+configs:
+  cfssl:
+    host: ca.example.com
+    httpcnprefix: http.cfssl.svc
+    country: US
+    state: California
+    locale: "San Francisco"
+    organization: "Internet Widgets, LLC"
+    organizationalunit: "Systems Engineering"
+    caname: "CA"
+    initcaname: "Int CA"
+    rootcacn: "My-Root-CA"
+    intermediatecacn: "My-Intermediate-CA"
+secretsRef: "__required__"

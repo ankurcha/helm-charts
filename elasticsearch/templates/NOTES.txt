@@ -1,0 +1,12 @@
+Services available:
+
+1. ElasticSearch cluster transport:
+- https://elasticsearch-logging.{{ .Release.Namespace }}.svc.{{ .Values.context }}.local:{{ .Values.services.elasticsearch.externalPort }}
+
+2. Nginx Prometheus-compatible ping server:
+- https://elasticsearch-logging.{{ .Release.Namespace }}.svc.{{ .Values.context }}.local:{{ .Values.services.nginx.externalPort }}/ping
+
+3. Nginx Prometheus-compatible metrics servers:
+- https://$POD_IP:{{ .Values.services.metrics.internalPort }}/metrics
+
+REMINDER: Set "Retain" Reclaim Policy on this Chart's PVs if you want to keep the data after the chart has been deleted!

@@ -1,0 +1,28 @@
+# Default values for fluentd.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+# Special values:
+# - kubecontext changed by override on-the-fly for downward-API like function
+kubecontext: cluster
+containers:
+  fluentd:
+    image:
+      repository: gcr.io/google_containers/fluentd-elasticsearch
+      tag: 1.22
+      pullPolicy: IfNotPresent
+    resources:
+      limits:
+        cpu: 500m
+        memory: 200Mi
+      requests:
+        cpu: 100m
+        memory: 200Mi
+monitoring:
+  probe_services: true
+alerting:
+  chat_channels: alerts
+  paging_profiles: 24x7
+metrics:
+  scrape_prometheus: true
+  prometheus_port: 9145
+secretsRef: "__required__"

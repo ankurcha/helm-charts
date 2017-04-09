@@ -1,0 +1,1 @@
+Fluentd should now be installed on each k8s node via a Daemonset
