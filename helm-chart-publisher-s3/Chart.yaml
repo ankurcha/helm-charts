@@ -1,4 +1,0 @@
-apiVersion: v1
-description: Publishes Helm Chart to S3
-name: helm-chart-publisher-s3
-version: 0.1.0
