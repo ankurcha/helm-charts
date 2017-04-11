@@ -2,3 +2,14 @@ apiVersion: v1
 description: A Helm chart for Kubernetes
 name: http-starter
 version: 0.1.0
+description: A single-sentence description of this project (optional)
+keywords:
+  - http-starter
+  - helm-starter-chart
+home: https://github.com/shaneramey/helm-charts
+sources:
+  - https://kubernetes.io/
+maintainers: # (optional)
+  - name: Shane Ramey
+    email: shane.ramey@gmail.com
+icon: https://commons.wikimedia.org/wiki/File:Question-mark-blackandwhite.png
