@@ -2,6 +2,9 @@ kind: ClusterRoleBinding
 apiVersion: rbac.authorization.k8s.io/v1beta1
 metadata:
   name: run-nfs-provisioner
+  annotations:
+    "helm.sh/hook": pre-install
+    "helm.sh/hook-weight": "10"
 subjects:
   - kind: ServiceAccount
     name: nfs-provisioner
