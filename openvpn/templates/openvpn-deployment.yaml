@@ -51,5 +51,5 @@ spec:
       volumes:
       - name: openvpn
         configMap:
-          name: {{ template "fullname" . }}
+          name: openvpn
           "defaultMode": 0775
