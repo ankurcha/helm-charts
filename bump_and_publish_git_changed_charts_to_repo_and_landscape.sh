@@ -8,12 +8,16 @@ charts_needing_to_be_published=()
 while read -r line ; do
     TOP_LEVEL_FILE_CHANGED=$line
     if [ -d $TOP_LEVEL_FILE_CHANGED ]; then
+	# this is really a chart?
     	grep ^version\: $TOP_LEVEL_FILE_CHANGED/Chart.yaml > /dev/null 2>&1 
     	if [ $? -eq 0 ]; then
-    		NON_VERSION_CHANGE_COUNT=`git diff HEAD~1 \
-    			$TOP_LEVEL_FILE_CHANGED/Chart.yaml | egrep -e '^[-+]' | \
+               CHART_YAML_NON_VERSION_CHANGES=`git diff HEAD~1 \
+                       $TOP_LEVEL_FILE_CHANGED/Chart.yaml | egrep -e '^[-+]' | \
     			egrep -v '^[-+]version' | egrep -v '^[-+]{3}' | wc -l`
-    		if [ $NON_VERSION_CHANGE_COUNT -ne 0 ]; then
+		CHART_OTHER_FILES_CHANGES=`git diff HEAD~1 . ':(exclude)*/Chart.yaml' | \
+			egrep -e '^[-+]' | egrep -v '^[-+]version' | egrep -v '^[-+]{3}' | wc -l`
+    		if [ $CHART_YAML_NON_VERSION_CHANGES -ne 0 ] || \
+			[ $CHART_OTHER_FILES_CHANGES -ne 0 ]; then
     			charts_needing_to_be_published+=("$TOP_LEVEL_FILE_CHANGED")
     		fi
     	fi
