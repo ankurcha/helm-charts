@@ -1,0 +1,43 @@
+# Default values for django-nginx.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+replicaCount: 1
+containers:
+  django:
+    repository: us.gcr.io/downup-164000/nginx
+    tag: 781280cd1e86663ad60bf3a12c8a9befa6059cb0
+    pullPolicy: IfNotPresent
+  nginx:
+    repository: us.gcr.io/downup-164000/nginx
+    tag: 781280cd1e86663ad60bf3a12c8a9befa6059cb0
+    pullPolicy: IfNotPresent
+resources:
+  django:
+    limits:
+      cpu: 100m
+      memory: 32Mi
+    requests:
+      cpu: 10m
+      memory: 8Mi
+  nginx:
+    limits:
+      cpu: 100m
+      memory: 32Mi
+    requests:
+      cpu: 10m
+      memory: 10Mi
+monitoring:
+  probe_services: true
+alerting:
+  chat_channels: alerts
+  paging_profiles: 24x7
+metrics:
+  scrape_prometheus: true
+  prometheus_port: 9145
+services:
+  http:
+    type: ClusterIP
+    externalPort: 443
+    internalPort: 443
+  uwsgi:
+    internalPort: 9090
