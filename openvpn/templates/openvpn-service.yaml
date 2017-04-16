@@ -1,7 +1,7 @@
 kind: Service
 apiVersion: v1
 metadata:
-  name: openvpn2
+  name: openvpn
   labels:
     chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
     type: openvpn
