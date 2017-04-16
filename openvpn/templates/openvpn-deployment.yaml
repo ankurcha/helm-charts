@@ -20,7 +20,7 @@ spec:
     metadata:
       labels:
         app: openvpn
-      service: openvpn
+        service: openvpn
         heritage: {{.Release.Service | quote }}
         release: {{.Release.Name | quote }}
         chart: "{{.Chart.Name}}-{{.Chart.Version}}"
