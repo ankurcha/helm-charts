@@ -4,7 +4,7 @@ metadata:
   name: openvpn
   labels:
     chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
-    type: openvpn
+    service: openvpn
 spec:
   ports:
     - name: openvpn
@@ -12,5 +12,6 @@ spec:
       targetPort: {{ .Values.service.internalPort }}
       protocol: {{ .Values.openvpn.OVPN_PROTO | upper }}
   selector:
-    app: {{ template "fullname" . }}
+    app: openvpn
+    service: openvpn
   type: {{ .Values.service.type }}

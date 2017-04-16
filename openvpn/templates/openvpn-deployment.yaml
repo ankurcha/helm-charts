@@ -11,16 +11,16 @@ spec:
   revisionHistoryLimit: 0
   selector:
     matchLabels:
-      app: {{ template "fullname" . }}
-      type: openvpn
+      app: openvpn
+      service: openvpn
       heritage: {{.Release.Service | quote }}
       release: {{.Release.Name | quote }}
       chart: "{{.Chart.Name}}-{{.Chart.Version}}"
   template:
     metadata:
       labels:
-        app: {{ template "fullname" . }}
-        type: openvpn
+        app: openvpn
+      service: openvpn
         heritage: {{.Release.Service | quote }}
         release: {{.Release.Name | quote }}
         chart: "{{.Chart.Name}}-{{.Chart.Version}}"
