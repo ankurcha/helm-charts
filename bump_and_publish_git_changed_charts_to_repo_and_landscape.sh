@@ -25,6 +25,9 @@ while read -r line ; do
 done < <(git diff HEAD~1 --name-only | awk -F/ '{ print $1 }' | sort | uniq)
 
 for chart_to_publish in "${charts_needing_to_be_published[@]}"; do
-	make HELM_CHART_NAME=$chart_to_publish bump_version
+	git add $chart_to_publish
+	NEW_VERSION=`helm local_bump -f $chart_to_publish/Chart.yaml --bump-level=patch | awk '{ print $NF }'`
+	git commit -m "$chart_to_publish/version bump to v$NEW_VERSION"
+	git push
 	make HELM_CHART_NAME=$chart_to_publish publish_helm_chart_to_repo
 done
