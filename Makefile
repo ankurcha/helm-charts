@@ -12,11 +12,19 @@ installstarters:
 lint_helm:
 	helm lint $(HELM_CHART_NAME)/
 
-bump_version_and_publish_helm_chart_to_repo:
+add_repo:
 	helm repo add $(HELM_REPO_NAME) $(HELM_CHART_REPO)
 
+bump_version:
 	helm local_bump -f ${CURDIR}/$(HELM_CHART_NAME)/Chart.yaml --bump-level=patch
-	./publish_helm.sh $(HELM_CHART_NAME)
+
+publish_git_changed_charts_to_repo:
+	./publish_git_changed_charts_to_repo.sh
+
+publish_helm_chart_to_repo:
+	./publish_helm_chart_to_repo.sh $(HELM_CHART_NAME)
+
+bump_version_and_publish_helm_chart_to_repo: bump_version publish_helm_chart_to_repo
 
 publish_helm: bump_version_and_publish_helm_chart_to_repo
 
