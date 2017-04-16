@@ -8,6 +8,14 @@ metadata:
     chart: "{{.Chart.Name}}-{{.Chart.Version}}"
 spec:
   replicas: {{ .Values.replicaCount }}
+  revisionHistoryLimit: 0
+  selector:
+    matchLabels:
+      app: {{ template "fullname" . }}
+      type: openvpn
+      heritage: {{.Release.Service | quote }}
+      release: {{.Release.Name | quote }}
+      chart: "{{.Chart.Name}}-{{.Chart.Version}}"
   template:
     metadata:
       labels:

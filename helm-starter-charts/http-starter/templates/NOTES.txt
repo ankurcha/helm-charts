@@ -14,4 +14,4 @@
   kubectl port-forward $POD_NAME 8080:{{ .Values.services.service1.externalPort }}
 {{- end }}
 
-2. Service should be up at https://http.{{ .Release.Namespace }}.svc.{{ .Values.kubecontext }}.local
+2. Service should be up at https://http.{{ .Release.Namespace }}.svc
