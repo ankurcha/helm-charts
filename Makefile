@@ -15,9 +15,6 @@ lint_helm:
 add_repo:
 	helm repo add $(HELM_REPO_NAME) $(HELM_CHART_REPO)
 
-bump_version:
-	helm local_bump -f ${CURDIR}/$(HELM_CHART_NAME)/Chart.yaml --bump-level=patch
-
 bump_and_publish_git_changed_charts_to_repo:
 	./bump_and_publish_git_changed_charts_to_repo_and_landscape.sh
 
