@@ -3,6 +3,8 @@ kind: Deployment
 metadata:
   name: openvpn
   labels:
+    app: openvpn
+    service: openvpn
     heritage: {{.Release.Service | quote }}
     release: {{.Release.Name | quote }}
     chart: "{{.Chart.Name}}-{{.Chart.Version}}"
