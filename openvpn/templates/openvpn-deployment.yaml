@@ -1,14 +1,14 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: {{ template "fullname" . }}
+  name: openvpn
   labels:
     heritage: {{.Release.Service | quote }}
     release: {{.Release.Name | quote }}
     chart: "{{.Chart.Name}}-{{.Chart.Version}}"
 spec:
   replicas: {{ .Values.replicaCount }}
-  revisionHistoryLimit: 0
+  revisionHistoryLimit: 3
   selector:
     matchLabels:
       app: {{ template "fullname" . }}

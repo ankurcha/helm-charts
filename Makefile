@@ -18,13 +18,11 @@ add_repo:
 bump_version:
 	helm local_bump -f ${CURDIR}/$(HELM_CHART_NAME)/Chart.yaml --bump-level=patch
 
-publish_git_changed_charts_to_repo:
-	./publish_git_changed_charts_to_repo.sh
+bump_and_publish_git_changed_charts_to_repo:
+	./bump_and_publish_git_changed_charts_to_repo_and_landscape.sh
 
 publish_helm_chart_to_repo:
 	./publish_helm_chart_to_repo.sh $(HELM_CHART_NAME)
-
-bump_version_and_publish_helm_chart_to_repo: bump_version publish_helm_chart_to_repo
 
 publish_helm: bump_version_and_publish_helm_chart_to_repo
 
