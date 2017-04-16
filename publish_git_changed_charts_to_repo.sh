@@ -10,7 +10,9 @@ while read -r line ; do
     if [ -d $TOP_LEVEL_FILE_CHANGED ]; then
     	grep ^version\: $TOP_LEVEL_FILE_CHANGED/Chart.yaml > /dev/null 2>&1 
     	if [ $? -eq 0 ]; then
-    		NON_VERSION_CHANGE_COUNT=`git diff HEAD~1 $TOP_LEVEL_FILE_CHANGED/Chart.yaml | egrep -e '^[-+]' | egrep -v '^[-+]version' | egrep -v '^[-+]{3}' | wc -l`
+    		NON_VERSION_CHANGE_COUNT=`git diff HEAD~1 \
+    			$TOP_LEVEL_FILE_CHANGED/Chart.yaml | egrep -e '^[-+]' | \
+    			egrep -v '^[-+]version' | egrep -v '^[-+]{3}' | wc -l`
     		if [ $NON_VERSION_CHANGE_COUNT -ne 0 ]; then
     			charts_needing_to_be_published+=("$TOP_LEVEL_FILE_CHANGED")
     		fi
