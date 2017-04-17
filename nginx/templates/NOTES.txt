@@ -1,10 +1,10 @@
 Services available:
 
 1. Nginx HTTP server
-- https://http.{{ .Release.Namespace }}.svc.{{ .Values.kubecontext }}.local:{{ .Values.services.nginx.externalPort }}
+- https://http.{{ .Release.Namespace }}.svc:{{ .Values.services.nginx.externalPort }}
 
 2. Nginx Prometheus-compatible ping server:
-- https://http.{{ .Release.Namespace }}.svc.{{ .Values.kubecontext }}.local:{{ .Values.services.nginx.externalPort }}/ping
+- https://http.{{ .Release.Namespace }}.svc:{{ .Values.services.nginx.externalPort }}/ping
 
 3. Nginx Prometheus-compatible metrics servers:
 - http://$POD_IP:{{ .Values.services.metrics.internalPort }}/metrics
