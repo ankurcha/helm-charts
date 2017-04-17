@@ -35,7 +35,7 @@ metrics:
   scrape_prometheus: true
   prometheus_port: 9145
 services:
-  http:
+  nginx:
     type: ClusterIP
     externalPort: 443
     internalPort: 443

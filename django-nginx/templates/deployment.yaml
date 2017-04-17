@@ -3,7 +3,9 @@ kind: Deployment
 metadata:
   name: http
   labels:
+    app: {{ template "fullname" . }}
     chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    service: http
 spec:
   replicas: {{ .Values.replicaCount }}
   template:
@@ -21,26 +23,22 @@ spec:
                 "image": "{{ .Values.containers.cfssl.image.repository }}:{{ .Values.containers.cfssl.image.tag }}",
                 "imagePullPolicy": "{{ .Values.containers.cfssl.image.pullPolicy }}",
                 "command": ["/etc/bootstrap/init.sh"],
-                "workingDir": "/initial-certificate-store",
+                "workingDir": "/pre-secrets",
                 "volumeMounts": [
                   {
-                    "name": "pki",
-                    "mountPath": "/etc/cfssl-bootstrap"
+                    "name": "pre-secrets",
+                    "mountPath": "/pre-secrets"
                   },
                   {
-                    "name": "bootstrap-init",
-                    "mountPath": "/etc/bootstrap"
-                  },
-                  {
-                    "name": "initial-certificates",
-                    "mountPath": "/initial-certificate-store"
+                    "name": "tls-workdir",
+                    "mountPath": "/tls-workdir"
                   }
                 ]
             }
         ]'
       labels:
-        chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
         app: {{ template "fullname" . }}
+        chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
         service: http
     spec:
       containers:

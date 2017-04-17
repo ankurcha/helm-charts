@@ -55,3 +55,32 @@ server {
   }
 }
 {{- end -}}
+
+{{- define "csr-options" -}}
+{
+  "hosts": [
+    "http.{{ .Release.Namespace }}.svc.__CLUSTER_DOMAIN__"
+  ],
+  "CN": "http.{{ .Release.Namespace }}.svc.__CLUSTER_DOMAIN__",
+  "key": {
+    "algo": "ecdsa",
+    "size": 256
+  }
+}
+{{- end -}}
+
+
+{{- define "csr-k8s" -}}
+apiVersion: certificates.k8s.io/v1beta1
+kind: CertificateSigningRequest
+metadata:
+  name: http.{{ .Release.Namespace }}.svc.__CLUSTER_DOMAIN__
+spec:
+  groups:
+  - system:authenticated
+  request: $(cat server.csr | base64 | tr -d '\n')
+  usages:
+  - digital signature
+  - key encipherment
+  - server auth
+{{- end -}}
