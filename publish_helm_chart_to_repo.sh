@@ -21,6 +21,9 @@ rm -f $PWD/$HELM_CHART_NAME/build/${HELM_CHART_NAME}-*.tgz
 # helm package --sign --key 'D84669B161B026671A86575290FBE1F81D70695D' \
 #       --keyring ~/.gnupg/secring.gpg -d build/ $(HELM_CHART_NAME)/
 
+# update dependencies and place them in charts/ directory
+helm dependency update $PWD/$HELM_CHART_NAME
+
 export HELM_PACKAGE_FILE=`helm package $PWD/$HELM_CHART_NAME -d $PWD/$HELM_CHART_NAME/build --debug --save=false | grep -v "Warning" | awk '{ print \$2 }'`
 
 echo HELM_PACKAGE_FILE=$HELM_PACKAGE_FILE
