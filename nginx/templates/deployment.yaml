@@ -37,10 +37,14 @@ spec:
             path: /ping
             port: {{ .Values.services.nginx.internalPort }}
             scheme: HTTPS
+          initialDelaySeconds: 5
+          periodSeconds: 5
         readinessProbe:
           httpGet:
             path: /ping
             port: {{ .Values.services.nginx.internalPort }}
             scheme: HTTPS
+          initialDelaySeconds: 5
+          periodSeconds: 5
         resources:
 {{ toYaml .Values.resources | indent 12 }}
