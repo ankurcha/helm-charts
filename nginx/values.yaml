@@ -3,10 +3,22 @@
 # Declare variables to be passed into your templates.
 replicaCount: 1
 containers:
+  cfssl:
+    image:
+      repository: us.gcr.io/downup-164000/cfssl
+      tag: 1.2.0
+      pullPolicy: IfNotPresent
+    resources: # FIXME: apply these in deployment
+      limits:
+        cpu: 100m
+        memory: 32Mi
+      requests:
+        cpu: 100m
+        memory: 10Mi
   nginx:
     image:
       repository: us.gcr.io/downup-164000/nginx
-      tag: c9c725592e5cd07ed6b66fcbb784dc71cbc23fa4
+      tag: 0b2bb9eec079ebdf1b620484b45b2332cac47be1
       pullPolicy: IfNotPresent
     resources:
       limits:

@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: {{ template "fullname" . }}
   labels:
-    chart: "{{ .Chart.Name }}"
+    chart: "{{.Chart.Name}}-{{.Chart.Version}}"
     app: nginx
     service: http
 spec:
@@ -11,7 +11,7 @@ spec:
   revisionHistoryLimit: {{ template "globalDeploymentRevisionHistory" . }}
   selector:
     matchLabels:
-      chart: "{{ .Chart.Name }}"
+      chart: "{{.Chart.Name}}-{{.Chart.Version}}"
       app: nginx
       service: http
   template:
@@ -22,10 +22,10 @@ spec:
         checksum/init-setup: {{ include (print $.Template.BasePath "/init-setup-configmap.yaml") . | sha256sum }}
         pod.alpha.kubernetes.io/init-containers: '[
             {
-                "name": "sign-initial-certs",
+                "name": "gen-csr",
                 "image": "{{ .Values.containers.cfssl.image.repository }}:{{ .Values.containers.cfssl.image.tag }}",
                 "imagePullPolicy": "{{ .Values.containers.cfssl.image.pullPolicy }}",
-                "command": ["/pre-secrets/init.sh"],
+                "command": ["sleep", "99999"],
                 "workingDir": "/tls-workdir",
                 "volumeMounts": [
                   {
@@ -41,7 +41,7 @@ spec:
             }
         ]'
       labels:
-        chart: "{{ .Chart.Name }}"
+        chart: "{{.Chart.Name}}-{{.Chart.Version}}"
         app: nginx
         service: http
     spec:
