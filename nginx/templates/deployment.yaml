@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: {{ template "fullname" . }}
   labels:
-    chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
+    chart: "{{ .Chart.Name }}"
     app: nginx
     service: http
 spec:
@@ -11,7 +11,9 @@ spec:
   template:
     metadata:
       labels:
-        app: {{ template "fullname" . }}
+        chart: "{{ .Chart.Name }}"
+        app: nginx
+        service: http
     spec:
       containers:
       - name: {{ .Chart.Name }}
