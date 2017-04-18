@@ -2,3 +2,4 @@ vendor
 build
 .vscode
 *.swp
+*/charts/*.tgz
