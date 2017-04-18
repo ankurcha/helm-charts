@@ -25,8 +25,22 @@ spec:
       - name: {{ .Chart.Name }}
         image: "{{ .Values.containers.nginx.image.repository }}:{{ .Values.containers.nginx.image.tag }}"
         imagePullPolicy: {{ .Values.containers.nginx.image.pullPolicy }}
-        command: ["sleep", "999999"]
         ports:
         - containerPort: {{ .Values.services.nginx.internalPort }}
+          name: https
+          protocol: TCP
+        - containerPort: {{ .Values.services.metrics.internalPort }}
+          name: metrics
+          protocol: TCP
+        livenessProbe:
+          httpGet:
+            path: /ping
+            port: {{ .Values.services.nginx.internalPort }}
+            scheme: HTTPS
+        readinessProbe:
+          httpGet:
+            path: /ping
+            port: {{ .Values.services.nginx.internalPort }}
+            scheme: HTTPS
         resources:
 {{ toYaml .Values.resources | indent 12 }}

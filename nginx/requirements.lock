@@ -5,6 +5,6 @@ dependencies:
   name: base
   repository: http://charts.downup.us
   tags: null
-  version: 0.1.8
-digest: sha256:9bc42bfefaf430c9635ac5793ce56c794b537c03024a97358543fd4b5f1d79c2
-generated: 2017-04-18T01:38:12.283777768-07:00
+  version: 0.1.10
+digest: sha256:4e5fe987d0ca7ad80ef6904503cc663df704adb4ac327b0f07c57e8111986aab
+generated: 2017-04-18T02:46:42.165467296-07:00

@@ -15,8 +15,8 @@ lint_helm:
 add_repo:
 	helm repo add $(HELM_REPO_NAME) $(HELM_CHART_REPO)
 
-bump_and_publish_git_changed_charts_to_repo:
-	./bump_and_publish_git_changed_charts_to_repo_and_landscape.sh
+publish_git_changed_charts_to_repo:
+	./publish_git_changed_charts_to_repo_and_landscape.sh
 
 publish_helm_chart_to_repo:
 	./publish_helm_chart_to_repo.sh $(HELM_CHART_NAME)

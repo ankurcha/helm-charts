@@ -7,7 +7,7 @@ containers:
   nginx:
     image:
       repository: us.gcr.io/downup-164000/nginx
-      tag: 781280cd1e86663ad60bf3a12c8a9befa6059cb0
+      tag: c9c725592e5cd07ed6b66fcbb784dc71cbc23fa4
       pullPolicy: IfNotPresent
     resources:
       limits:
