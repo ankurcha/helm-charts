@@ -1,0 +1,10 @@
+dependencies:
+- condition: ""
+  enabled: false
+  import-values: null
+  name: base
+  repository: http://charts.downup.us
+  tags: null
+  version: 0.1.0
+digest: sha256:732f6f68d59508a9240a987687ab5eab06a244a70af852c385b77f7a74dabbb7
+generated: 2017-04-18T01:22:49.434517199-07:00

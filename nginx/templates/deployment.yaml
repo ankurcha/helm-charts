@@ -8,6 +8,12 @@ metadata:
     service: http
 spec:
   replicas: {{ .Values.replicaCount }}
+  revisionHistoryLimit: {{ template "globalDeploymentRevisionHistory" . }}
+  selector:
+    matchLabels:
+      chart: "{{ .Chart.Name }}"
+      app: nginx
+      service: http
   template:
     metadata:
       labels:
