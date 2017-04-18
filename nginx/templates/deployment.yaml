@@ -17,6 +17,7 @@ spec:
       - name: {{ .Chart.Name }}
         image: "{{ .Values.containers.nginx.image.repository }}:{{ .Values.containers.nginx.image.tag }}"
         imagePullPolicy: {{ .Values.containers.nginx.image.pullPolicy }}
+        command: ["sleep", "999999"]
         ports:
         - containerPort: {{ .Values.services.nginx.internalPort }}
         livenessProbe:
