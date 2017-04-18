@@ -28,13 +28,5 @@ spec:
         command: ["sleep", "999999"]
         ports:
         - containerPort: {{ .Values.services.nginx.internalPort }}
-        livenessProbe:
-          httpGet:
-            path: /
-            port: {{ .Values.services.nginx.internalPort }}
-        readinessProbe:
-          httpGet:
-            path: /
-            port: {{ .Values.services.nginx.internalPort }}
         resources:
 {{ toYaml .Values.resources | indent 12 }}
