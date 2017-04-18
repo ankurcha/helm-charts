@@ -16,6 +16,30 @@ spec:
       service: http
   template:
     metadata:
+      annotations:
+        alert-chat-channels: {{ .Values.alerting.chat_channels | quote }}
+        alert-paging-profiles: {{ .Values.alerting.paging_profiles | quote }}
+        checksum/init-setup: {{ include (print $.Template.BasePath "/init-setup-configmap.yaml") . | sha256sum }}
+        pod.alpha.kubernetes.io/init-containers: '[
+            {
+                "name": "sign-initial-certs",
+                "image": "{{ .Values.containers.cfssl.image.repository }}:{{ .Values.containers.cfssl.image.tag }}",
+                "imagePullPolicy": "{{ .Values.containers.cfssl.image.pullPolicy }}",
+                "command": ["/pre-secrets/init.sh"],
+                "workingDir": "/tls-workdir",
+                "volumeMounts": [
+                  {
+                    "name": "pre-secrets",
+                    "mountPath": "/pre-secrets"
+                  },
+                  {
+                    "name": "tls-workdir",
+                    "mountPath": "/tls-workdir"
+                  }
+                ],
+                "resources": {{ toJson .Values.containers.cfssl.resources }}
+            }
+        ]'
       labels:
         chart: "{{ .Chart.Name }}"
         app: nginx
@@ -47,4 +71,22 @@ spec:
           initialDelaySeconds: 5
           periodSeconds: 5
         resources:
-{{ toYaml .Values.resources | indent 12 }}
+{{ toYaml .Values.containers.nginx.resources | indent 12 }}
+        volumeMounts:
+        - mountPath: /etc/nginx/ssl
+          name: tls-workdir
+          readOnly: true
+      volumes:
+        - name: pre-secrets
+          configMap:
+            name: init-setup
+            defaultMode: 0755
+            items:
+            - key: init.sh
+              path: init.sh
+            - key: csr-submit.sh
+              path: csr-submit.sh
+            - key: csr-retrieve.sh
+              path: csr-retrieve.sh
+        - name: tls-workdir
+          emptyDir: {}

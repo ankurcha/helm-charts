@@ -1,0 +1,38 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: init-setup
+data:
+  init.sh: |
+    #! /bin/sh
+    CLUSTER_DOMAIN=`grep search /etc/resolv.conf  | awk '{ print $NF }'
+    cat <<EOF | cfssl genkey - | cfssljson -bare server
+    {
+      "hosts": [
+        "http.{{ .Release.Namespace }}.svc.$CLUSTER_DOMAIN"
+      ],
+      "CN": "http.{{ .Release.Namespace }}.svc.$CLUSTER_DOMAIN",
+      "key": {
+        "algo": "ecdsa",
+        "size": 256
+      }
+    }
+    EOF
+  csr-submit.sh: |+
+    cat <<EOF | kubectl create -f -
+    apiVersion: certificates.k8s.io/v1beta1
+    kind: CertificateSigningRequest
+    metadata:
+      name: http.{{ .Release.Namespace }}.svc.$CLUSTER_DOMAIN
+    spec:
+      groups:
+      - system:authenticated
+      request: $(cat server.csr | base64 | tr -d '\n')
+      usages:
+      - digital signature
+      - key encipherment
+      - server auth
+    EOF
+  csr-retrieve.sh: |
+    kubectl get csr my-svc.my-namespace -o jsonpath='{.status.certificate}' \
+            | base64 -d > server.crt
