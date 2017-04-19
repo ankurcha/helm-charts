@@ -27,6 +27,6 @@ limits:
       memory: 6Mi
   pvc:
     max:
-      storage: 2Ti
+      storage: 3Ti
     min:
       storage: 10Mi
