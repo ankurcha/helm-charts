@@ -15,4 +15,3 @@ TODO: to deploy a specific chart, run:
 ```
 make -C chart_name publish_helm
 ```
-
