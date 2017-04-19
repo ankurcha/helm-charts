@@ -1,36 +1,57 @@
-# Default values for postgresql.
-# This is a YAML-formatted file.
-# Declare variables to be passed into your templates.
-replicaCount: 1
-kubecontext: cluster
-containers:
-  postgresql:
-    image:
-      repository: downup/postgres
-      tag: 9.5.6
-      pullPolicy: IfNotPresent
-resources:
-  postgresql:
-    limits:
-      cpu: 100m
-      memory: 32Mi
-    requests:
-      cpu: 10m
-      memory: 8Mi
-monitoring:
-  probe_services: true
-alerting:
-  chat_channels: alerts
-  paging_profiles: 24x7
-metrics:
-  scrape_prometheus: true
-  prometheus_port: 9145
-services:
-  db:
-    type: ClusterIP
-    externalPort: 5432
-    internalPort: 5432
+## postgres image repository
+image: "postgres"
+## postgres image version
+## ref: https://hub.docker.com/r/library/postgres/tags/
+##
+imageTag: "9.6.2"
+
+## Specify a imagePullPolicy
+## 'Always' if imageTag is 'latest', else set to 'IfNotPresent'
+## ref: http://kubernetes.io/docs/user-guide/images/#pre-pulling-images
+##
+# imagePullPolicy:
+
+## Create a database user
+## Default: postgres
+# postgresUser:
+## Default: random 10 character string
+# postgresPassword:
+
+## Create a database
+## Default: the postgres user
+# postgresDatabase:
+
+## Persist data to a persitent volume
 persistence:
-  size: 256Mi
-  storageClass: default
-secretsRef: "__required__"
+  enabled: true
+
+  ## A manually managed Persistent Volume and Claim
+  ## Requires persistence.enabled: true
+  ## If defined, PVC must be created manually before volume will be bound
+  # existingClaim:
+
+  ## If defined, volume.beta.kubernetes.io/storage-class: <storageClass>
+  ## Default: volume.alpha.kubernetes.io/storage-class: default
+  ##
+  # storageClass:
+  accessMode: ReadWriteOnce
+  size: 8Gi
+  subPath: "postgresql-db"
+
+metrics:
+  enabled: false
+  image: wrouesnel/postgres_exporter
+  imageTag: v0.1.1
+  imagePullPolicy: IfNotPresent
+  resources:
+    requests:
+      memory: 256Mi
+      cpu: 100m
+
+## Configure resource requests and limits
+## ref: http://kubernetes.io/docs/user-guide/compute-resources/
+##
+resources:
+  requests:
+    memory: 256Mi
+    cpu: 100m

@@ -1,10 +1,18 @@
-apiVersion: v1
-description: A Helm chart for Kubernetes
-name: postgresql
-version: 0.1.1
-home: https://postgresql.org
+description: Object-relational database management system (ORDBMS) with an emphasis
+  on extensibility and on standards-compliance.
+engine: gotpl
+home: https://www.postgresql.org/
+icon: https://www.postgresql.org/media/img/about/press/elephant.png
+keywords:
+- postgresql
+- postgres
+- database
+- sql
 maintainers:
-- email: shane.ramey@gmail.com
-  name: Shane Ramey
+- name: swordbeta
+- name: databus23
+name: postgresql
 sources:
-- https://hub.docker.com/_/postgres/
+- https://github.com/kubernetes/charts
+- https://github.com/docker-library/postgres
+version: 0.6.0
