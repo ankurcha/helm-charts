@@ -3,9 +3,9 @@ kind: ConfigMap
 metadata:
   name: init-setup
 data:
-  init.sh: |
+  gen-csr.sh: |
     #! /bin/sh
-    CLUSTER_DOMAIN=`grep search /etc/resolv.conf  | awk '{ print $NF }'
+    CLUSTER_DOMAIN=`grep search /etc/resolv.conf  | awk '{ print $NF }'`
     cat <<EOF | cfssl genkey - | cfssljson -bare server
     {
       "hosts": [
@@ -18,7 +18,14 @@ data:
       }
     }
     EOF
-  csr-submit.sh: |+
+  csr-submit-cfssl.sh: |+
+    cfssl gencert -remote=http.cfssl.svc -profile=server server.csr
+  csr-retrieve-cfssl.sh: |
+    kubectl get csr my-svc.my-namespace -o jsonpath='{.status.certificate}' \
+            | base64 -d > server.crt
+  csr-submit-k8s.sh: |+
+    CLUSTER_DOMAIN=`grep search /etc/resolv.conf  | awk '{ print $NF }'`
+    CSR=`cat server.csr | base64 | tr -d '\n'`
     cat <<EOF | kubectl create -f -
     apiVersion: certificates.k8s.io/v1beta1
     kind: CertificateSigningRequest
@@ -27,12 +34,12 @@ data:
     spec:
       groups:
       - system:authenticated
-      request: $(cat server.csr | base64 | tr -d '\n')
+      request: $CSR
       usages:
       - digital signature
       - key encipherment
       - server auth
     EOF
-  csr-retrieve.sh: |
+  csr-retrieve-k8s.sh: |
     kubectl get csr my-svc.my-namespace -o jsonpath='{.status.certificate}' \
             | base64 -d > server.crt

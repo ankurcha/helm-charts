@@ -3,7 +3,6 @@ kind: Deployment
 metadata:
   name: {{ template "fullname" . }}
   labels:
-    chart: "{{.Chart.Name}}-{{.Chart.Version}}"
     app: nginx
     service: http
 spec:
@@ -20,13 +19,32 @@ spec:
         alert-chat-channels: {{ .Values.alerting.chat_channels | quote }}
         alert-paging-profiles: {{ .Values.alerting.paging_profiles | quote }}
         checksum/init-setup: {{ include (print $.Template.BasePath "/init-setup-configmap.yaml") . | sha256sum }}
-        pod.alpha.kubernetes.io/init-containers: '[
+        pod.beta.kubernetes.io/init-containers: '[
             {
                 "name": "gen-csr",
                 "image": "{{ .Values.containers.cfssl.image.repository }}:{{ .Values.containers.cfssl.image.tag }}",
                 "imagePullPolicy": "{{ .Values.containers.cfssl.image.pullPolicy }}",
-                "command": ["sleep", "99999"],
+                "command": ["/pre-secrets/gen-csr.sh"],
                 "workingDir": "/tls-workdir",
+                "volumeMounts": [
+                  {
+                    "name": "pre-secrets",
+                    "mountPath": "/pre-secrets"
+                  },
+                  {
+                    "name": "tls-workdir",
+                    "mountPath": "/tls-workdir"
+                  }
+                ],
+                "resources": {{ toJson .Values.containers.cfssl.resources }}
+            },
+            {
+                "name": "csr-submit",
+                "image": "{{ .Values.containers.cfssl.image.repository }}:{{ .Values.containers.cfssl.image.tag }}",
+                "imagePullPolicy": "{{ .Values.containers.cfssl.image.pullPolicy }}",
+                "command": ["/pre-secrets/csr-submit.sh"],
+                "workingDir": "/tls-workdir",
+                "command": ["sleep", "999999"],
                 "volumeMounts": [
                   {
                     "name": "pre-secrets",
@@ -82,11 +100,11 @@ spec:
             name: init-setup
             defaultMode: 0755
             items:
-            - key: init.sh
-              path: init.sh
-            - key: csr-submit.sh
+            - key: gen-csr.sh
+              path: gen-csr.sh
+            - key: csr-submit-{{ .Values.pki.ca_type }}.sh
               path: csr-submit.sh
-            - key: csr-retrieve.sh
+            - key: csr-retrieve-{{ .Values.pki.ca_type }}.sh
               path: csr-retrieve.sh
         - name: tls-workdir
           emptyDir: {}

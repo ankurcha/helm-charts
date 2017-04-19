@@ -8,7 +8,19 @@ containers:
       repository: us.gcr.io/downup-164000/cfssl
       tag: 1.2.0
       pullPolicy: IfNotPresent
-    resources: # FIXME: apply these in deployment
+    resources:
+      limits:
+        cpu: 100m
+        memory: 32Mi
+      requests:
+        cpu: 100m
+        memory: 10Mi
+  kubectl:
+    image:
+      repository: us.gcr.io/downup-164000/k8s-kubectl
+      tag: v1.6.0
+      pullPolicy: IfNotPresent
+    resources:
       limits:
         cpu: 100m
         memory: 32Mi
@@ -42,4 +54,5 @@ alerting:
 metrics:
   scrape_prometheus: true
   prometheus_port: 9145
-
+pki:
+  ca_type: cfssl # can be one of "cfssl" or "k8s"
