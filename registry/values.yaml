@@ -48,4 +48,4 @@ services:
     internalPort: 5432
 persistence:
   size: 256Mi
-  storageClass: default
+  storageClass: standard

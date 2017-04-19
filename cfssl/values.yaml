@@ -6,15 +6,15 @@ kubecontext: cluster
 containers:
   cfssl:
     image:
-      repository: downup/cfssl
+      repository: us.gcr.io/downup-164000/cfssl
       tag: 1.2.0
       pullPolicy: IfNotPresent
       args:
         - serve
   nginx:
     image:
-      repository: downup/nginx-prom
-      tag: 0.1.0
+      repository: us.gcr.io/downup-164000/nginx
+      tag: 0b2bb9eec079ebdf1b620484b45b2332cac47be1
       pullPolicy: IfNotPresent
 resources:
   cfssl:
@@ -50,7 +50,7 @@ services:
     internalPort: 5432
 persistence:
   size: 256Mi
-  storageClass: default
+  storageClass: standard
 configs:
   cfssl:
     host: ca.example.com
