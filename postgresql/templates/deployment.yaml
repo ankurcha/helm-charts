@@ -56,7 +56,7 @@ spec:
           timeoutSeconds: 3
           periodSeconds: 5
         resources:
-{{ toYaml .Values.resources | indent 10 }}
+{{ toYaml .Values.resources.postgresql | indent 10 }}
         volumeMounts:
         - name: data
           mountPath: /var/lib/postgresql/data/pgdata
@@ -72,7 +72,7 @@ spec:
         - name: metrics
           containerPort: 9187
         resources:
-{{ toYaml .Values.metrics.resources | indent 10 }}
+{{ toYaml .Values.metrics.resources.postgresql_exporter | indent 10 }}
 {{- end }}
       volumes:
       - name: data

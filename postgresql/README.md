@@ -104,3 +104,11 @@ The volume defaults to mount at a subdirectory of the volume instead of the volu
 
 ## Metrics
 The chart optionally can start a metrics exporter for [prometheus](https://prometheus.io). The metrics endpoint (port 9187) is not exposed and it is expected that the metrics are collected from inside the k8s cluster using something similar as the described in the [example Prometheus scrape configuration](https://github.com/prometheus/prometheus/blob/master/documentation/examples/prometheus-kubernetes.yml).
+
+## Secrets
+The following secrets get injected by Landscaper
+convention for secret names is "secret-${CHART_NAME}-any_valid_k8s_secret_key"
+  reasons for this:
+    envconsul currently forces SECRET_ to be prefixed in all env vars, for security reasons
+    the landscaper deployment script namespaces secrets by their chart name, to prevent name collisions
+- secret-postgresql-postgres-password

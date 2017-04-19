@@ -52,17 +52,17 @@ persistence:
   container1:
     volume1:
     - size: 256Mi
-      storageClass: default
+      storageClass: standard
     volume2:
     - size: 256Mi
-      storageClass: default
+      storageClass: standard
   container2:
     volume1:
     - size: 256Mi
-      storageClass: default
+      storageClass: standard
     volume2:
     - size: 256Mi
-      storageClass: default
+      storageClass: standard
 secretsRef: "__required__"
 configs:
   container1:

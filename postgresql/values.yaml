@@ -44,5 +44,5 @@ services:
 persistence:
   enabled: true
   size: 256Mi
-  storageClass: default
+  storageClass: standard
 secretsRef: "__required__"
