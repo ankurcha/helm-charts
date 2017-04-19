@@ -15,8 +15,8 @@ spec:
     spec:
       containers:
       - name: {{ template "fullname" . }}
-        image: "{{ .Values.image }}:{{ .Values.imageTag }}"
-        imagePullPolicy: {{ default "" .Values.imagePullPolicy | quote }}
+        image: "{{ .Values.containers.postgresql.image.repository }}:{{ .Values.containers.postgresql.image.tag }}"
+        imagePullPolicy: {{ .Values.containers.postgresql.image.pullPolicy }}
         env:
         - name: POSTGRES_USER
           value: {{ default "postgres" .Values.postgresUser | quote }}
@@ -30,8 +30,8 @@ spec:
         - name: POSTGRES_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: {{ template "fullname" . }}
-              key: postgres-password
+              name: {{ .Values.secretsRef }}
+              key: secret-postgresql-postgres-password
         - name: POD_IP
           valueFrom: { fieldRef: { fieldPath: status.podIP } }
         ports:
