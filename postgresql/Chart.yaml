@@ -15,4 +15,4 @@ name: postgresql
 sources:
 - https://github.com/kubernetes/charts
 - https://github.com/docker-library/postgres
-version: 0.6.1
+version: 0.6.3
