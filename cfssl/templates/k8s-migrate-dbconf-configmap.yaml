@@ -11,4 +11,4 @@ data:
   dbconf-template.yml: |
     deploy:
     driver: postgres
-    open: user=__POSTGRES_DATABASE_USER__ password=__POSTGRES__DATABASE__PASSWORD__ host=database dbname=cfssl sslmode=disable
+    open: user=__POSTGRES_DATABASE_USER__ password=__POSTGRES__DATABASE__PASSWORD__ host=postgresql dbname=cfssl sslmode=disable

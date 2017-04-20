@@ -6,6 +6,7 @@ data:
   init.sh: |
     #! /bin/sh
     # substitute secrets in db DSN
+    sleep 99999
     mkdir /goose-init
     sed -e 's/__POSTGRES_DATABASE_USER__/$DATABASE_USERNAME/g' /goose-config/dbconf-template.yml > /goose-init/dbconf.yaml
     sed -ie 's/__POSTGRES_DATABASE_PASSWORD__/$DATABASE_PASSWORD/g' /goose-init/dbconf.yaml

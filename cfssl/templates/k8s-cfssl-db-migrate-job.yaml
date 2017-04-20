@@ -15,8 +15,7 @@ spec:
       - name: initdb
         image: "{{ .Values.containers.cfssl.image.repository }}:{{ .Values.containers.cfssl.image.tag }}"
         imagePullPolicy: {{ .Values.containers.cfssl.image.pullPolicy }}
-        command: ["sleep"]
-        args: ["99999999"]
+        command: ["/goose-init-template/init.sh"]
         env:
           - name: DATABASE_USERNAME
             valueFrom:
