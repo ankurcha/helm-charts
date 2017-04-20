@@ -22,12 +22,12 @@ spec:
             valueFrom:
               secretKeyRef:
                 name: {{ .Values.secretsRef }}
-                key: postgres-user
+                key: secret-postgresql-postgres-user
           - name: DATABASE_PASSWORD
             valueFrom:
               secretKeyRef:
                 name: {{ .Values.secretsRef }}
-                key: postgres-password
+                key: secret-postgresql-postgres-password
         volumeMounts:
           - name: init
             mountPath: /goose-init-template/

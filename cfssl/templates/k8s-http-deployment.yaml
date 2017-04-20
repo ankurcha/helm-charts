@@ -3,9 +3,16 @@ kind: Deployment
 metadata:
   name: http
   labels:
+    app: nginx
+    service: http
     chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
 spec:
   replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: nginx
+      service: http
+      chart: "{{.Chart.Name}}-{{.Chart.Version}}"
   template:
     metadata:
       annotations:
@@ -39,9 +46,9 @@ spec:
             }
         ]'
       labels:
-        chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
-        app: {{ template "fullname" . }}
+        app: nginx
         service: http
+        chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
     spec:
       containers:
       - name: cfssl

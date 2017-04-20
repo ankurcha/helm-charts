@@ -1,0 +1,10 @@
+dependencies:
+- condition: ""
+  enabled: false
+  import-values: null
+  name: postgresql
+  repository: http://charts.downup.us
+  tags: null
+  version: 0.6.1
+digest: sha256:5d150032bf2711c951f3e0bc4afe7d65bb006f2b75b2ba4ee46c28a369e1ac34
+generated: 2017-04-19T16:39:30.740781505-07:00

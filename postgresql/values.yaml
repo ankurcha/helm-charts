@@ -3,7 +3,7 @@ kubecontext: cluster
 containers:
   postgresql:
     image:
-      repository: downup/postgres
+      repository: us.gcr.io/downup-164000/postgres
       tag: 9.5.6
       pullPolicy: IfNotPresent
   postgresql_exporter:
