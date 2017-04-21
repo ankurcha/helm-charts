@@ -10,16 +10,16 @@ data:
       exit 0 # CA cert has already been initialized
     else
       /go/bin/cfssl gencert \
-        -initca /etc/cfssl-bootstrap/root-ca.json \
+        -initca /configs/root-ca.json \
         | /go/bin/cfssljson -bare root_ca
 
       /go/bin/cfssl gencert \
-        -initca /etc/cfssl-bootstrap/intermediate-ca.json \
+        -initca /configs/intermediate-ca.json \
         | /go/bin/cfssljson -bare intermediate_ca
 
       /go/bin/cfssl sign \
         -ca root_ca.pem -ca-key root_ca-key.pem \
-        -config /etc/cfssl-bootstrap/signing-profiles.json \
+        -config /configs/signing-profiles.json \
         -profile int \
         intermediate_ca.csr | cfssljson -bare intermediate_ca
 
@@ -29,12 +29,24 @@ data:
 
       cat intermediate_ca.pem root_ca.pem > chain.crt
 
-      /go/bin/cfssl gencert \
-        -ca intermediate_ca.pem -ca-key intermediate_ca-key.pem \
-        -config /etc/cfssl-bootstrap/signing-profiles.json \
-        -profile server \
-        /etc/cfssl-bootstrap/server_csr.json | /go/bin/cfssljson -bare http
+      # generate front-end server cert (https://http.cfssl.svc)
+      CLUSTER_DOMAIN=`grep search /etc/resolv.conf | awk '{ print $NF }'`
 
-      cat http.pem intermediate_ca.pem root_ca.pem > http-certificate.pem
-      cp http-key.pem http-certificate-key.pem
+      cat <<EOF > server-csr.json
+      {
+        "hosts": [
+          "http.cfssl.svc.${CLUSTER_DOMAIN}"
+        ],
+        "CN": "http.cfssl.svc.${CLUSTER_DOMAIN}",
+        "key": {
+          "algo": "ecdsa",
+          "size": 256
+        }
+      }
+    EOF
+      cfssl gencert \
+        -ca intermediate_ca.pem -ca-key intermediate_ca-key.pem \
+        -config /configs/signing-profiles.json \
+        -profile server server-csr.json | /go/bin/cfssljson -bare server
+      cat server.pem intermediate_ca.pem root_ca.pem > server-certificate.pem
     fi

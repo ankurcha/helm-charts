@@ -5,13 +5,6 @@ dependencies:
   name: postgresql
   repository: http://charts.downup.us
   tags: null
-  version: 0.6.3
-- condition: ""
-  enabled: false
-  import-values: null
-  name: nginx
-  repository: http://charts.downup.us
-  tags: null
-  version: 0.1.74
-digest: sha256:6731aaf59a6cde40f07b3929340086e2d89d4d1c733536ec24166573ae38981e
-generated: 2017-04-20T05:20:47.529756853-07:00
+  version: 0.6.4
+digest: sha256:abe30c69e4a869455784edc0f37dc6a23f80a34fafa3b606401d241dae2d0de4
+generated: 2017-04-20T07:51:38.769876302-07:00

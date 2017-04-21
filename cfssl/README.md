@@ -9,9 +9,9 @@ Deploys cfssl CA service to https://cfssl.kube-system.svc.$(cluster).local
   /goose-config/migrations/001_CreateCertificates.sql
   /goose-init-template/
 
-- http
-  - sign-initial-certs (init-container)
-    /etc/cfssl-bootstrap/
+- http (cfssl container)
+  - init-setup (sign initial certs)
+    /configs # pki parameters
     /etc/bootstrap/
     /initial-certificate-store/ (PVC)
 

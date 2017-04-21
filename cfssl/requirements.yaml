@@ -1,7 +1,4 @@
 dependencies:
   - name: postgresql
-    version: 0.6.3
-    repository: http://charts.downup.us
-  - name: nginx
-    version: 0.1.74
+    version: 0.6.4
     repository: http://charts.downup.us

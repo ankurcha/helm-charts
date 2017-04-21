@@ -1,18 +1,16 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: http
+  name: {{ template "fullname" . }}
   labels:
-    app: nginx
+    app: cfssl
     service: http
-    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
-      app: nginx
+      app: cfssl
       service: http
-      chart: "{{.Chart.Name}}-{{.Chart.Version}}"
   template:
     metadata:
       annotations:
@@ -24,15 +22,15 @@ spec:
         alert-paging-profiles: {{ .Values.alerting.paging_profiles | quote }}
         pod.alpha.kubernetes.io/init-containers: '[
             {
-                "name": "sign-initial-certs",
+                "name": "init-setup",
                 "image": "{{ .Values.containers.cfssl.image.repository }}:{{ .Values.containers.cfssl.image.tag }}",
                 "imagePullPolicy": "{{ .Values.containers.cfssl.image.pullPolicy }}",
-                "command": ["/etc/bootstrap/init.sh"],
+                "command": ["sleep", "999999"],
                 "workingDir": "/initial-certificate-store",
                 "volumeMounts": [
                   {
-                    "name": "pki",
-                    "mountPath": "/etc/cfssl-bootstrap"
+                    "name": "config-pki-parameters",
+                    "mountPath": "/configs"
                   },
                   {
                     "name": "bootstrap-init",
@@ -46,14 +44,18 @@ spec:
             }
         ]'
       labels:
-        app: nginx
+        app: cfssl
         service: http
-        chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
     spec:
       containers:
       - name: cfssl
         image: "{{ .Values.containers.cfssl.image.repository }}:{{ .Values.containers.cfssl.image.tag }}"
         imagePullPolicy: {{ .Values.containers.cfssl.image.pullPolicy }}
+        command: [ "serve" ]
+        args:
+          - -port=443
+          - -tls-key=/etc/cfssl/server-certificate.pem
+          - -tls-cert=/etc/cfssl/server-key.pem
         command: [ "sleep" ]
         args:
         - "999999"
@@ -74,36 +76,12 @@ spec:
         volumeMounts:
         - name: dbconfig
           mountPath: /secrets
-        - name: pki
+        - name: config-pki-parameters
           mountPath: /configs
         - name: initial-certificates
           mountPath: /etc/cfssl
         resources:
 {{ toYaml .Values.resources.cfssl | indent 12 }}
-      - name: nginx
-        image: "{{ .Values.containers.nginx.image.repository }}:{{ .Values.containers.nginx.image.tag }}"
-        imagePullPolicy: {{ .Values.containers.nginx.image.pullPolicy }}
-        # livenessProbe:
-        #   httpGet:
-        #     path: /ping
-        #     port: 443
-        #     scheme: HTTPS
-        ports:
-        - containerPort: 443
-          name: https
-          protocol: TCP
-        - containerPort: 9145
-          name: metrics
-          protocol: TCP
-        resources:
-{{ toYaml .Values.resources.nginx | indent 12 }}
-        volumeMounts:
-        - mountPath: /etc/nginx/sites-enabled
-          name: nginx-config
-          readOnly: true
-        - mountPath: /etc/nginx/ssl
-          name: initial-certificates
-          readOnly: true
       volumes:
         - name: dbconfig
           secret:
@@ -118,7 +96,7 @@ spec:
             items:
             - key: init.sh
               path: init.sh
-        - name: pki
+        - name: config-pki-parameters
           configMap:
             name: ca-signing
             items:
@@ -133,9 +111,3 @@ spec:
         - name: initial-certificates
           persistentVolumeClaim:
             claimName: initial-cert-store
-        - name: nginx-config
-          configMap:
-            name: nginx-site
-            items:
-            - key: nginx-site
-              path: default

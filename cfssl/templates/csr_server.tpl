@@ -1,10 +1,13 @@
 {{- define "csr_server" -}}
 {
-    "CN": "{{.Values.configs.cfssl.httpcnprefix}}.{{.Values.kubecontext}}.local",
+    "CN": "http.{{ .Release.Namespace }}.svc.$CLUSTER_DOMAIN",
     "key": {
         "algo": "ecdsa",
         "size": 256
     },
+    "hosts": [
+        "http.{{ .Release.Namespace }}.svc.$CLUSTER_DOMAIN"
+    ],
     "names": [
         {
             "C": "{{.Values.configs.cfssl.country}}",
