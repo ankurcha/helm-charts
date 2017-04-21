@@ -6,12 +6,14 @@ data:
   init.sh: |
     #! /bin/sh
     # substitute secrets in db DSN
-    sleep 99999
     mkdir /goose-init
-    sed -e "s/__POSTGRES_DATABASE_USER__/$DATABASE_USERNAME/g" /goose-config/dbconf-template.yml > /goose-init/dbconf.yaml
-    sed -ie "s/__POSTGRES_DATABASE_PASSWORD__/$DATABASE_PASSWORD/g" /goose-init/dbconf.yaml
+    cat << EOF > /goose-init/dbconf.yml
+    deploy:
+    driver: postgres
+    open: user=${DATABASE_USERNAME} password=${DATABASE_PASSWORD} host=postgresql dbname=cfssl sslmode=disable
+    EOF
     chmod +x /goose-init/dbconf.yaml
     # get goose, then run it
-    /usr/local/go/bin/go get -u bitbucket.org/liamstask/goose/cmd/goose
+    /usr/local/go/bin/go get -u github.com/steinbacher/goose/cmd/goose
     cp -r $GOPATH/src/github.com/cloudflare/cfssl/certdb/pg/migrations /goose-config/
-    /go/bin/goose -env deploy -path /goose-config/ up
+    /go/bin/goose -env deploy -path /goose-init/ up

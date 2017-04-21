@@ -19,10 +19,16 @@ spec:
         imagePullPolicy: {{ .Values.containers.postgresql.image.pullPolicy }}
         env:
         - name: POSTGRES_USER
-          value: {{ default "postgres" .Values.postgresUser | quote }}
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.secretsRef }}
+              key: secret-postgresql-postgres-user
           # Required for pg_isready in the health probes.
         - name: PGUSER
-          value: {{ default "postgres" .Values.postgresUser | quote }}
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.secretsRef }}
+              key: secret-postgresql-postgres-user
         - name: POSTGRES_DB
           value: {{ default "" .Values.postgresDatabase | quote }}
         - name: PGDATA

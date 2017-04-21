@@ -1,6 +1,8 @@
 # cfssl Helm Chart
 Deploys cfssl CA service to https://cfssl.kube-system.svc.$(cluster).local
 
+NEEDS:
+ health check
 ## Components
 
 ### Pod mounts

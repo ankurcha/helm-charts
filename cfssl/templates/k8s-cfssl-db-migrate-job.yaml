@@ -15,21 +15,21 @@ spec:
       - name: initdb
         image: "{{ .Values.containers.cfssl.image.repository }}:{{ .Values.containers.cfssl.image.tag }}"
         imagePullPolicy: {{ .Values.containers.cfssl.image.pullPolicy }}
-        command: ["/goose-init-template/init.sh"]
+        command: ["/init/init.sh"]
         env:
-          - name: DATABASE_USERNAME
-            valueFrom:
-              secretKeyRef:
-                name: {{ .Values.secretsRef }}
-                key: secret-postgresql-postgres-user
-          - name: DATABASE_PASSWORD
-            valueFrom:
-              secretKeyRef:
-                name: {{ .Values.secretsRef }}
-                key: secret-postgresql-postgres-password
+        - name: DATABASE_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.secretsRef }}
+              key: secret-postgresql-postgres-user
+        - name: DATABASE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.secretsRef }}
+              key: secret-postgresql-postgres-password
         volumeMounts:
           - name: init
-            mountPath: /goose-init-template/
+            mountPath: /init
           - name: dbconf-template
             mountPath: /goose-config/
           - name: db-migrations

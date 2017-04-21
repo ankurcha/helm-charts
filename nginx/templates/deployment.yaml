@@ -3,7 +3,6 @@ kind: Deployment
 metadata:
   name: {{ template "fullname" . }}
   labels:
-    chart: "{{.Chart.Name}}-{{.Chart.Version}}"
     app: nginx
     service: http
 spec:

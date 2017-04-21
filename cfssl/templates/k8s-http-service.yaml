@@ -18,4 +18,5 @@ spec:
     protocol: TCP
     name: {{ .Values.services.http.name | quote }}
   selector:
-    app: {{ template "fullname" . }}
+    app: {{ .Chart.Name }}
+    service: http
