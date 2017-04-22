@@ -87,6 +87,10 @@ kubectl logs http-3902911708-e3lhk -c sign-initial-certs
 `make overrides | bash`
 
 # TODO
+cfssl serve
+  -mutual-tls-ca="": Mutual TLS - require clients be signed by this CA
+  -mutual-tls-cn="": Mutual TLS - regex for whitelist of allowed client CNs
+
 - take CA + Int CA keys off of nginx container's /etc/nginx/ssl/
 - name whitelists
 ```
@@ -109,7 +113,6 @@ kubectl logs http-3902911708-e3lhk -c sign-initial-certs
 }
 ```
 
-- change StorageClass to "default" OOB
 - swap out static Helm Chart deployment release names
 # Resources
 https://hub.docker.com/r/cfssl/cfssl/

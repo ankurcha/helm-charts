@@ -57,9 +57,3 @@ data:
         "data_source": "postgres://${DATABASE_USERNAME}:${DATABASE_PASSWORD}@postgresql/cfssl?sslmode=disable"
     }
     EOFDBCONFIG
-
-    # copy configs + translate cluster CLUSTER_DOMAIN
-    # cat <<EOFSERVERCSR
-    # include "csr_server" . | js server-csr.json
-    # EOFSERVERCSR > /initial-certificate-store/server.csr
-

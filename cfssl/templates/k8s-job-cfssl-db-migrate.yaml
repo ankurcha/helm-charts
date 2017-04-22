@@ -14,7 +14,7 @@ spec:
       - name: initdb
         image: "{{ .Values.containers.cfssl.image.repository }}:{{ .Values.containers.cfssl.image.tag }}"
         imagePullPolicy: {{ .Values.containers.cfssl.image.pullPolicy }}
-        command: ["/bin/sh", "-c", "/init/init.sh", "1>", "/dev/stdout", "2>", "/dev/stderr"]
+        command: ["sleep", "999999"]
         env:
         - name: DATABASE_USERNAME
           valueFrom:

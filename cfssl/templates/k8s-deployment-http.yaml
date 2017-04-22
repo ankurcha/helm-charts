@@ -14,9 +14,8 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/config-cfssl-ca-signing: {{ include "cfssl/templates/k8s-cfssl-ca-signing-configmap.yaml" . | sha256sum }}
-        checksum/config-cfssl-bootstrap: {{ include "cfssl/templates/k8s-cfssl-bootstrap-configmap.yaml" . | sha256sum }}
-        checksum/config-nginx-site: {{ include "cfssl/templates/k8s-nginx-site-configmap.yaml" . | sha256sum }}
+        checksum/config-cfssl-ca-signing: {{ include "cfssl/templates/k8s--configmap-cfssl-ca-signing.yaml" . | sha256sum }}
+        checksum/config-cfssl-bootstrap: {{ include "cfssl/templates/k8s-configmap-cfsslconfigmap.yaml" . | sha256sum }}
         alert-chat-channels: {{ .Values.alerting.chat_channels | quote }}
         alert-paging-profiles: {{ .Values.alerting.paging_profiles | quote }}
         pod.alpha.kubernetes.io/init-containers: '[
@@ -72,13 +71,20 @@ spec:
         imagePullPolicy: {{ .Values.containers.cfssl.image.pullPolicy }}
         command: [ "cfssl" ]
         args:
-          - -loglevel=0
+          - -loglevel=1 # (0 = DEBUG, 5 = FATAL) (default 1)
           - serve
           - -address=0.0.0.0
           - -port=443
-          - -tls-cert=/etc/cfssl/server.pem
+          - -tls-cert=/etc/cfssl/server-certificate.pem
           - -tls-key=/etc/cfssl/server-key.pem
+          - -config=/configs/signing-profiles.json
           - -db-config=/etc/cfssl/db.config
+          - -ca=/etc/cfssl/root_ca.pem
+          - -ca-key=/etc/cfssl/root_ca-key.pem
+          - -ca-bundle=/etc/cfssl/ca-bundle.crt
+          - -int-bundle=/etc/cfssl/int-bundle.crt
+          - -responder=/etc/cfssl/server.pem
+          - -responder-key=/etc/cfssl/server-key.pem
         ports:
         - containerPort: {{ .Values.services.http.internalPort }}
         #livenessProbe:
