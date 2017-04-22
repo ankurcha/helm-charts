@@ -34,7 +34,7 @@ spec:
                 }
               },
               {
-                "name": "DATABASE_USERNAME",
+                "name": "DATABASE_PASSWORD",
                 "valueFrom": {
                   "secretKeyRef": {
                     "name": "{{ .Values.secretsRef }}",
@@ -43,7 +43,7 @@ spec:
                 }
               }
             ],
-            "command": ["/bin/sh", "-c", "/init/init.sh", "1>", "/dev/stdout", "2>", "/dev/stderr"],
+            "command": ["/bin/sh", "-c", "/init/init.sh"],
             "workingDir": "/initial-certificate-store",
             "volumeMounts": [
               {
