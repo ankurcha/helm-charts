@@ -32,7 +32,7 @@ data:
       # generate front-end server cert (https://http.cfssl.svc)
       CLUSTER_DOMAIN=`grep search /etc/resolv.conf | awk '{ print $NF }'`
 
-      cat <<EOF > server-csr.json
+      cat <<EOFCSR > server-csr.json
       {
         "hosts": [
           "http.cfssl.svc.${CLUSTER_DOMAIN}"
@@ -43,10 +43,23 @@ data:
           "size": 256
         }
       }
-    EOF
+    EOFCSR
       cfssl gencert \
         -ca intermediate_ca.pem -ca-key intermediate_ca-key.pem \
         -config /configs/signing-profiles.json \
         -profile server server-csr.json | /go/bin/cfssljson -bare server
       cat server.pem intermediate_ca.pem root_ca.pem > server-certificate.pem
     fi
+    echo "writing cfssl database config"
+    cat << EOFDBCONFIG > /initial-certificate-store/db.config
+    {
+        "driver": "postgres",
+        "data_source": "postgres://${DATABASE_USERNAME}:${DATABASE_PASSWORD}@postgresql/cfssl?sslmode=disable"
+    }
+    EOFDBCONFIG
+
+    # copy configs + translate cluster CLUSTER_DOMAIN
+    # cat <<EOFSERVERCSR
+    # include "csr_server" . | js server-csr.json
+    # EOFSERVERCSR > /initial-certificate-store/server.csr
+

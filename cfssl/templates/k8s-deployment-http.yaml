@@ -17,31 +17,50 @@ spec:
         checksum/config-cfssl-ca-signing: {{ include "cfssl/templates/k8s-cfssl-ca-signing-configmap.yaml" . | sha256sum }}
         checksum/config-cfssl-bootstrap: {{ include "cfssl/templates/k8s-cfssl-bootstrap-configmap.yaml" . | sha256sum }}
         checksum/config-nginx-site: {{ include "cfssl/templates/k8s-nginx-site-configmap.yaml" . | sha256sum }}
-        checksum/secret-cfssl-dsn: {{ include "cfssl/templates/k8s-cfssl-db-dsn-secret.yaml" . | sha256sum }}
         alert-chat-channels: {{ .Values.alerting.chat_channels | quote }}
         alert-paging-profiles: {{ .Values.alerting.paging_profiles | quote }}
         pod.alpha.kubernetes.io/init-containers: '[
-            {
-                "name": "init-setup",
-                "image": "{{ .Values.containers.cfssl.image.repository }}:{{ .Values.containers.cfssl.image.tag }}",
-                "imagePullPolicy": "{{ .Values.containers.cfssl.image.pullPolicy }}",
-                "command": ["/init/init.sh"],
-                "workingDir": "/initial-certificate-store",
-                "volumeMounts": [
-                  {
-                    "name": "config-pki-parameters",
-                    "mountPath": "/configs"
-                  },
-                  {
-                    "name": "init-setup-script",
-                    "mountPath": "/init"
-                  },
-                  {
-                    "name": "initial-certificates",
-                    "mountPath": "/initial-certificate-store"
+          {
+            "name": "init-setup",
+            "image": "{{ .Values.containers.cfssl.image.repository }}:{{ .Values.containers.cfssl.image.tag }}",
+            "imagePullPolicy": "{{ .Values.containers.cfssl.image.pullPolicy }}",
+            "env": [
+              {
+                "name": "DATABASE_USERNAME",
+                "valueFrom": {
+                  "secretKeyRef": {
+                    "name": "{{ .Values.secretsRef }}",
+                    "key": "secret-postgresql-postgres-user"
                   }
-                ]
-            }
+                }
+              },
+              {
+                "name": "DATABASE_USERNAME",
+                "valueFrom": {
+                  "secretKeyRef": {
+                    "name": "{{ .Values.secretsRef }}",
+                    "key": "secret-postgresql-postgres-password"
+                  }
+                }
+              }
+            ],
+            "command": ["/bin/sh", "-c", "/init/init.sh", "1>", "/dev/stdout", "2>", "/dev/stderr"],
+            "workingDir": "/initial-certificate-store",
+            "volumeMounts": [
+              {
+                "name": "init-setup-script",
+                "mountPath": "/init"
+              },
+              {
+                "name": "initial-certificates",
+                "mountPath": "/initial-certificate-store"
+              },
+              {
+                "name": "config-pki-parameters",
+                "mountPath": "/configs"
+              }
+            ]
+          }
         ]'
       labels:
         app: cfssl
@@ -53,11 +72,13 @@ spec:
         imagePullPolicy: {{ .Values.containers.cfssl.image.pullPolicy }}
         command: [ "cfssl" ]
         args:
+          - -loglevel=0
           - serve
           - -address=0.0.0.0
           - -port=443
           - -tls-cert=/etc/cfssl/server.pem
           - -tls-key=/etc/cfssl/server-key.pem
+          - -db-config=/etc/cfssl/db.config
         ports:
         - containerPort: {{ .Values.services.http.internalPort }}
         #livenessProbe:
@@ -73,8 +94,6 @@ spec:
         #  initialDelaySeconds: 1
         #  timeoutSeconds: 1
         volumeMounts:
-        - name: dbconfig
-          mountPath: /secrets
         - name: config-pki-parameters
           mountPath: /configs
         - name: initial-certificates
@@ -82,12 +101,6 @@ spec:
         resources:
 {{ toYaml .Values.resources.cfssl | indent 12 }}
       volumes:
-        - name: dbconfig
-          secret:
-            secretName: cfssl-db-dsn
-            items:
-            - key: db-config
-              path: db.config 
         - name: init-setup-script
           configMap:
             name: cfssl-bootstrap
@@ -105,8 +118,6 @@ spec:
               path: intermediate-ca.json
             - key: signing-profiles.json
               path: signing-profiles.json
-            - key: server_csr.json
-              path: server_csr.json
         - name: initial-certificates
           persistentVolumeClaim:
             claimName: initial-cert-store

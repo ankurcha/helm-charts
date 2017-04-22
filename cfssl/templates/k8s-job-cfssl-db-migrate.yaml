@@ -7,7 +7,6 @@ spec:
     metadata:
       name: migrate
       annotations:
-        checksum/migrate-init: {{ include "cfssl/templates/migrate-init-configmap.yaml" . | sha256sum }}
         checksum/goose-config: {{ include "cfssl/templates/migrate-dbconf-template-configmap.yaml" . | sha256sum }}
         checksum/goose-migrations: {{ include "cfssl/templates/database-migrations-configmap.yaml" . | sha256sum }}
     spec:
@@ -15,7 +14,7 @@ spec:
       - name: initdb
         image: "{{ .Values.containers.cfssl.image.repository }}:{{ .Values.containers.cfssl.image.tag }}"
         imagePullPolicy: {{ .Values.containers.cfssl.image.pullPolicy }}
-        command: ["/init/init.sh"]
+        command: ["/bin/sh", "-c", "/init/init.sh", "1>", "/dev/stdout", "2>", "/dev/stderr"]
         env:
         - name: DATABASE_USERNAME
           valueFrom:

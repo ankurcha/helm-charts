@@ -23,21 +23,21 @@ spec:
             secretKeyRef:
               name: {{ .Values.secretsRef }}
               key: secret-postgresql-postgres-user
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.secretsRef }}
+              key: secret-postgresql-postgres-password
           # Required for pg_isready in the health probes.
         - name: PGUSER
           valueFrom:
             secretKeyRef:
               name: {{ .Values.secretsRef }}
               key: secret-postgresql-postgres-user
-        - name: POSTGRES_DB
-          value: {{ default "" .Values.postgresDatabase | quote }}
         - name: PGDATA
           value: /var/lib/postgresql/data/pgdata
-        - name: POSTGRES_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: {{ .Values.secretsRef }}
-              key: secret-postgresql-postgres-password
+        - name: POSTGRES_DB
+          value: {{ required "a valid .Values.configs.postgresDatabase required!" .Values.configs.postgresDatabase }}
         - name: POD_IP
           valueFrom: { fieldRef: { fieldPath: status.podIP } }
         ports:

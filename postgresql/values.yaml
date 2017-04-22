@@ -46,3 +46,5 @@ persistence:
   size: 256Mi
   storageClass: standard
 secretsRef: "__required__"
+configs:
+  postgresDatabase: '' # set this in a wrapper Chart (e.g., cfssl)

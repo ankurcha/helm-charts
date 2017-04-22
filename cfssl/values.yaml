@@ -9,8 +9,6 @@ containers:
       repository: us.gcr.io/downup-164000/cfssl
       tag: 1.2.0
       pullPolicy: IfNotPresent
-      args:
-        - serve
   nginx:
     image:
       repository: us.gcr.io/downup-164000/nginx
@@ -64,3 +62,6 @@ configs:
     rootcacn: "My-Root-CA"
     intermediatecacn: "My-Intermediate-CA"
 secretsRef: "__required__"
+postgresql:
+  configs:
+    postgresDatabase: cfssl

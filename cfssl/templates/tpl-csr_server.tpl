@@ -1,12 +1,12 @@
 {{- define "csr_server" -}}
 {
-    "CN": "http.{{ .Release.Namespace }}.svc.$CLUSTER_DOMAIN",
+    "CN": "2http.{{ .Release.Namespace }}.svc.${CLUSTER_DOMAIN}",
     "key": {
         "algo": "ecdsa",
         "size": 256
     },
     "hosts": [
-        "http.{{ .Release.Namespace }}.svc.$CLUSTER_DOMAIN"
+        "http.{{ .Release.Namespace }}.svc.${CLUSTER_DOMAIN}"
     ],
     "names": [
         {
@@ -18,5 +18,4 @@
         }
     ]
 }
-
 {{- end -}}

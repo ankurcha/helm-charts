@@ -5,6 +5,6 @@ dependencies:
   name: postgresql
   repository: http://charts.downup.us
   tags: null
-  version: 0.6.5
-digest: sha256:8ebb83013bf6d9f9da0994ccf121b48ce93c683e9742596df1ec14cbd5630ade
-generated: 2017-04-21T15:54:36.149269895-07:00
+  version: 0.6.8
+digest: sha256:22602c98b9782852f2b25887adebfe29a5ffb04e07e02a3d554f5cdd2395bf6b
+generated: 2017-04-21T18:50:03.27838543-07:00
