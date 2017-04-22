@@ -9,12 +9,15 @@ spec:
       annotations:
         checksum/goose-config: {{ include "cfssl/templates/migrate-dbconf-template-configmap.yaml" . | sha256sum }}
         checksum/goose-migrations: {{ include "cfssl/templates/database-migrations-configmap.yaml" . | sha256sum }}
+      labels:
+        app: cfssl
+        service: migrate
     spec:
       containers:
       - name: initdb
         image: "{{ .Values.containers.cfssl.image.repository }}:{{ .Values.containers.cfssl.image.tag }}"
         imagePullPolicy: {{ .Values.containers.cfssl.image.pullPolicy }}
-        command: ["sleep", "999999"]
+        command: ["/bin/sh", "-c", "/init/migrate.sh"]
         env:
         - name: DATABASE_USERNAME
           valueFrom:
@@ -29,24 +32,20 @@ spec:
         volumeMounts:
           - name: init
             mountPath: /init
-          - name: dbconf-template
+          - name: workingdir
             mountPath: /goose-config/
           - name: db-migrations
             mountPath: /goose-config/migrations
       volumes:
         - name: init
           configMap:
-            name: migrate-init
+            name: migrate-bootstrap
             defaultMode: 0755
             items:
-            - key: init.sh
-              path: init.sh
-        - name: dbconf-template
-          configMap:
-            name: migrate-dbconf-template
-            items:
-            - key: dbconf-template.yml
-              path: dbconf-template.yml
+            - key: migrate.sh
+              path: migrate.sh
+        - name: workingdir
+          emptyDir: {}
         - name: db-migrations
           configMap:
             name: database-migrations

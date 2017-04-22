@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: cfssl-bootstrap
+  name: ca-bootstrap
 data:
   init.sh: |
     #! /bin/sh

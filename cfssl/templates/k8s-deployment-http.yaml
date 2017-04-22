@@ -71,7 +71,7 @@ spec:
         imagePullPolicy: {{ .Values.containers.cfssl.image.pullPolicy }}
         command: [ "cfssl" ]
         args:
-          - -loglevel=1 # (0 = DEBUG, 5 = FATAL) (default 1)
+          - -loglevel=0 # (0 = DEBUG, 5 = FATAL) (default 1)
           - serve
           - -address=0.0.0.0
           - -port=443
@@ -109,7 +109,7 @@ spec:
       volumes:
         - name: init-setup-script
           configMap:
-            name: cfssl-bootstrap
+            name: ca-bootstrap
             defaultMode: 0755
             items:
             - key: init.sh

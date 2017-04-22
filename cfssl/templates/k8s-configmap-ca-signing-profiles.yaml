@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ca-signing
+data:
+  root-ca.json: "{{include "csr_root_ca" . | js }}"
+  intermediate-ca.json: "{{include "csr_intermediate_ca" . | js }}"
+  signing-profiles.json: "{{include "config_signing_profiles_json" . | js }}"
