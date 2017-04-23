@@ -55,8 +55,8 @@ Master:
 
 Agent:
   Enabled: true
-  Image: jenkinsci/jnlp-slave
-  ImageTag: 2.62
+  Image: us.gcr.io/downup-164000/jenkins-jnlp-slave
+  ImageTag: bd1051dc6a367130c94750251db38e32cd3a3262
   Cpu: "200m"
   Memory: "256Mi"
 
