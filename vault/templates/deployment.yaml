@@ -1,0 +1,51 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: vault
+  labels:
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+spec:
+  replicas: {{ .Values.replicaCount }}
+  template:
+    metadata:
+      annotations:
+        checksum/nginx-tls-secret: {{ include "vault/templates/nginx-tls-secret.yaml" . | sha256sum }}
+        checksum/vault-config-configmap: {{ include "vault/templates/vault-config-configmap.yaml" . | sha256sum }}
+        checksum/vault-config.tpl: {{ include "vault/templates/vault-config.tpl" . | sha256sum }}
+        alert-chat-channels: {{ .Values.alerting.chat_channels | quote }}
+        alert-paging-profiles: {{ .Values.alerting.paging_profiles | quote }}
+      labels:
+        chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+        app: {{ template "fullname" . }}
+        service: http
+    spec:
+      containers:
+      - name: vault
+        image: "{{ .Values.containers.vault.image.repository }}:{{ .Values.containers.vault.image.tag }}"
+        imagePullPolicy: {{ .Values.containers.vault.image.pullPolicy }}
+        ports:
+        - containerPort: {{ .Values.services.http.internalPort }}
+        env:
+        - name: VAULT_LOCAL_CONFIG
+          valueFrom:
+            configMapKeyRef:
+              name: vault-config
+              key: config
+        volumeMounts:
+        - mountPath: /etc/vault/ssl/certs/
+          name: nginx-tls
+          readOnly: true
+        #livenessProbe:
+        #  httpGet:
+        #    path: /healthz
+        #    port: {{ .Values.services.http.internalPort }}
+        #  initialDelaySeconds: 1
+        #  timeoutSeconds: 1
+        #readinessProbe:
+        #  httpGet:
+        #    path: /healthz
+        #    port: {{ .Values.services.http.internalPort }}
+        #  initialDelaySeconds: 1
+        #  timeoutSeconds: 1
+        resources:
+{{ toYaml .Values.containers.vault.resources | indent 12 }}

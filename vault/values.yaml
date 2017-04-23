@@ -1,0 +1,62 @@
+# Default values for __CHART_NAME__.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+# Special values:
+# - kubecontext changed by override on-the-fly for downward-API like function
+# - configs - overridden by confd values.configs.yaml (via Makefile)
+# - secrets - overridden by confd values.secrets.yaml (via Makefile)
+kubecontext: cluster
+replicaCount: 1
+services:
+  http:
+    type: ClusterIP
+    externalPort: 8200
+    internalPort: 8200
+  db:
+    type: ClusterIP
+    externalPort: 5432
+    internalPort: 5432
+containers:
+  vault:
+    image:
+      repository: vault
+      tag: 0.6.4
+      pullPolicy: IfNotPresent
+    resources:
+      limits:
+        cpu: 100m
+        memory: 32Mi
+      requests:
+        cpu: 10m
+        memory: 8Mi
+    persistence:
+      size: 256Mi
+      storageClass: default
+  nginx:
+    image:
+      repository: nginx-prom
+      tag: latest
+      pullPolicy: IfNotPresent
+      args:
+    resources:
+      limits:
+        cpu: 100m
+        memory: 32Mi
+      requests:
+        cpu: 10m
+        memory: 10Mi
+monitoring:
+  probe_services: true
+alerting:
+  chat_channels: alerts
+  paging_profiles: 24x7
+metrics:
+  scrape_prometheus: true
+  prometheus_port: 9145
+secrets:
+  vault:
+    server_tls_cert: cert
+    server_tls_key: key
+    roottoken: d435eebb-0d4c-b38f-9e19-7a074a531c2c
+configs:
+  test: a

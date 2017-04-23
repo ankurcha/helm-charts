@@ -1,0 +1,4 @@
+[template]
+dest = "values.configs.yaml"
+src = "values.yaml.tmpl"
+keys = [ "/config/downup/vault",]
