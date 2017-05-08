@@ -18,51 +18,13 @@ spec:
       annotations:
         alert-chat-channels: {{ .Values.alerting.chat_channels | quote }}
         alert-paging-profiles: {{ .Values.alerting.paging_profiles | quote }}
-        checksum/init-setup: {{ include (print $.Template.BasePath "/init-setup-configmap.yaml") . | sha256sum }}
-        pod.beta.kubernetes.io/init-containers: '[
-            {
-                "name": "gen-csr",
-                "image": "{{ .Values.containers.cfssl.image.repository }}:{{ .Values.containers.cfssl.image.tag }}",
-                "imagePullPolicy": "{{ .Values.containers.cfssl.image.pullPolicy }}",
-                "command": ["/pre-secrets/gen-csr.sh"],
-                "workingDir": "/tls-workdir",
-                "volumeMounts": [
-                  {
-                    "name": "pre-secrets",
-                    "mountPath": "/pre-secrets"
-                  },
-                  {
-                    "name": "tls-workdir",
-                    "mountPath": "/tls-workdir"
-                  }
-                ],
-                "resources": {{ toJson .Values.containers.cfssl.resources }}
-            },
-            {
-                "name": "csr-submit",
-                "image": "{{ .Values.containers.cfssl.image.repository }}:{{ .Values.containers.cfssl.image.tag }}",
-                "imagePullPolicy": "{{ .Values.containers.cfssl.image.pullPolicy }}",
-                "command": ["/pre-secrets/csr-submit.sh"],
-                "workingDir": "/tls-workdir",
-                "command": ["sleep", "999999"],
-                "volumeMounts": [
-                  {
-                    "name": "pre-secrets",
-                    "mountPath": "/pre-secrets"
-                  },
-                  {
-                    "name": "tls-workdir",
-                    "mountPath": "/tls-workdir"
-                  }
-                ],
-                "resources": {{ toJson .Values.containers.cfssl.resources }}
-            }
-        ]'
       labels:
         chart: "{{.Chart.Name}}-{{.Chart.Version}}"
         app: nginx
         service: http
     spec:
+      initContainers:
+{{ include "common.certificate_init_container.container" . | indent 8 }}
       containers:
       - name: {{ .Chart.Name }}
         image: "{{ .Values.containers.nginx.image.repository }}:{{ .Values.containers.nginx.image.tag }}"
@@ -89,22 +51,10 @@ spec:
           initialDelaySeconds: 5
           periodSeconds: 5
         resources:
-{{ toYaml .Values.containers.nginx.resources | indent 12 }}
+{{ toYaml .Values.containers.nginx.resources | trim | indent 10 }}
         volumeMounts:
-        - mountPath: /etc/nginx/ssl
-          name: tls-workdir
+        - mountPath: /usr/local/openresty/nginx/ssl
+          name: certificate-init-container-workdir
           readOnly: true
       volumes:
-        - name: pre-secrets
-          configMap:
-            name: init-setup
-            defaultMode: 0755
-            items:
-            - key: gen-csr.sh
-              path: gen-csr.sh
-            - key: csr-submit-{{ .Values.pki.ca_type }}.sh
-              path: csr-submit.sh
-            - key: csr-retrieve-{{ .Values.pki.ca_type }}.sh
-              path: csr-retrieve.sh
-        - name: tls-workdir
-          emptyDir: {}
+{{ include "common.certificate_init_container.volume" . | indent 8 }}
