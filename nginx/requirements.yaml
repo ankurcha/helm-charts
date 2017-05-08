@@ -1,4 +1,4 @@
 dependencies:
-  - name: base
-    version: 0.1.12
+  - name: common
+    version: 0.0.1
     repository: http://charts.downup.us

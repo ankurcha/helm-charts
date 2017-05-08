@@ -14,8 +14,8 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/config-cfssl-ca-signing: {{ include "cfssl/templates/k8s-configmap-cfssl-ca-signing.yaml" . | sha256sum }}
-        checksum/config-cfssl-bootstrap: {{ include "cfssl/templates/k8s-configmap-cfsslconfigmap.yaml" . | sha256sum }}
+        checksum/ca-bootstrap: {{ include "cfssl/templates/k8s-configmap-ca-bootstrap.yaml" . | sha256sum }}
+        checksum/ca-signing-profiles: {{ include "cfssl/templates/k8s-configmap-ca-signing-profiles.yaml" . | sha256sum }}
         alert-chat-channels: {{ .Values.alerting.chat_channels | quote }}
         alert-paging-profiles: {{ .Values.alerting.paging_profiles | quote }}
         pod.alpha.kubernetes.io/init-containers: '[

@@ -2,6 +2,7 @@
 
 A collection of Landscaper-compatible Kubernetes Helm Charts
 
+## Starter charts
 Template "starter charts" are in the [helm-starter-charts/](helm-starter-charts/) directory
 
 To create a helm chart from a "starter" chart:

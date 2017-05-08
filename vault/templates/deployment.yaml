@@ -6,17 +6,60 @@ metadata:
     chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
 spec:
   replicas: {{ .Values.replicaCount }}
+  revisionHistoryLimit: {{ template "globalDeploymentRevisionHistory" . }}
+  selector:
+    matchLabels:
+      chart: "{{.Chart.Name}}-{{.Chart.Version}}"
+      app: vault
+      service: http
   template:
     metadata:
       annotations:
-        checksum/nginx-tls-secret: {{ include "vault/templates/nginx-tls-secret.yaml" . | sha256sum }}
         checksum/vault-config-configmap: {{ include "vault/templates/vault-config-configmap.yaml" . | sha256sum }}
         checksum/vault-config.tpl: {{ include "vault/templates/vault-config.tpl" . | sha256sum }}
         alert-chat-channels: {{ .Values.alerting.chat_channels | quote }}
         alert-paging-profiles: {{ .Values.alerting.paging_profiles | quote }}
+        pod.beta.kubernetes.io/init-containers: '[
+            {
+                "name": "gen-csr",
+                "image": "{{ .Values.containers.cfssl.image.repository }}:{{ .Values.containers.cfssl.image.tag }}",
+                "imagePullPolicy": "{{ .Values.containers.cfssl.image.pullPolicy }}",
+                "command": ["/pre-secrets/gen-csr.sh"],
+                "workingDir": "/tls-workdir",
+                "volumeMounts": [
+                  {
+                    "name": "pre-secrets",
+                    "mountPath": "/pre-secrets"
+                  },
+                  {
+                    "name": "tls-workdir",
+                    "mountPath": "/tls-workdir"
+                  }
+                ],
+                "resources": {{ toJson .Values.containers.cfssl.resources }}
+            },
+            {
+                "name": "csr-submit",
+                "image": "{{ .Values.containers.cfssl.image.repository }}:{{ .Values.containers.cfssl.image.tag }}",
+                "imagePullPolicy": "{{ .Values.containers.cfssl.image.pullPolicy }}",
+                "workingDir": "/tls-workdir",
+                "command": ["sleep", "999999"],
+                "volumeMounts": [
+                  {
+                    "name": "pre-secrets",
+                    "mountPath": "/pre-secrets"
+                  },
+                  {
+                    "name": "tls-workdir",
+                    "mountPath": "/tls-workdir"
+                  }
+                ],
+                "resources": {{ toJson .Values.containers.cfssl.resources }}
+            }
+        ]'
       labels:
-        chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
-        app: {{ template "fullname" . }}
+        chart: "{{.Chart.Name}}-{{.Chart.Version}}"
+        app: vault
         service: http
     spec:
       containers:
@@ -33,8 +76,24 @@ spec:
               key: config
         volumeMounts:
         - mountPath: /etc/vault/ssl/certs/
-          name: nginx-tls
+          name: tls-workdir
           readOnly: true
+        resources:
+{{ toYaml .Values.containers.vault.resources | indent 12 }}
+      volumes:
+        - name: pre-secrets
+          configMap:
+            name: init-setup
+            defaultMode: 0755
+            items:
+            - key: gen-csr.sh
+              path: gen-csr.sh
+            - key: csr-submit-{{ .Values.pki.ca_type }}.sh
+              path: csr-submit.sh
+            - key: csr-retrieve-{{ .Values.pki.ca_type }}.sh
+              path: csr-retrieve.sh
+        - name: tls-workdir
+          emptyDir: {}
         #livenessProbe:
         #  httpGet:
         #    path: /healthz
@@ -47,5 +106,3 @@ spec:
         #    port: {{ .Values.services.http.internalPort }}
         #  initialDelaySeconds: 1
         #  timeoutSeconds: 1
-        resources:
-{{ toYaml .Values.containers.vault.resources | indent 12 }}

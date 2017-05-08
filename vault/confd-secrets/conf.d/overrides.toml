@@ -1,4 +1,0 @@
-[template]
-dest = "values.secrets.yaml"
-src = "values.yaml.tmpl"
-keys = [ "/secret/downup/vault/vault",]

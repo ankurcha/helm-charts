@@ -1,0 +1,17 @@
+dependencies:
+- condition: ""
+  enabled: false
+  import-values: null
+  name: consul
+  repository: http://charts.downup.us
+  tags: null
+  version: 0.2.3
+- condition: ""
+  enabled: false
+  import-values: null
+  name: base
+  repository: http://charts.downup.us
+  tags: null
+  version: 0.1.12
+digest: sha256:66f640b271d2418014c83e96555450a37628bb2636a4df02c099c280fd5a0879
+generated: 2017-04-23T02:32:41.399646444-07:00

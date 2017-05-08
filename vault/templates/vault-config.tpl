@@ -12,7 +12,7 @@
   "backend": {
     "consul": {
       "path": "hashicorp-vault",
-      "address": "vault-consul:8500"
+      "address": "consul:8500"
     }
   }
 {{- end -}}

@@ -1,4 +1,7 @@
 dependencies:
   - name: consul
-    version: 0.1.0
-    repository: https://http.helm.svc.downup.local
+    version: 0.2.3
+    repository: http://charts.downup.us
+  - name: base
+    version: 0.1.12
+    repository: http://charts.downup.us

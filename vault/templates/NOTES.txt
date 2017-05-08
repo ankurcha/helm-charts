@@ -1,4 +1,2 @@
 1. Services available:
-https://http.{{ .Release.Namespace }}.svc.{{ .Values.context }}.local:{{ .Values.services.http.externalPort }}
-
-"Retain" Reclaim Policy will now be applied to this Chart's 2 PVs
+https://http.{{ .Release.Namespace }}.svc:{{ .Values.services.http.externalPort }}

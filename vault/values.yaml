@@ -17,6 +17,18 @@ services:
     externalPort: 5432
     internalPort: 5432
 containers:
+  cfssl:
+    image:
+      repository: us.gcr.io/downup-164000/cfssl
+      tag: 1.2.0
+      pullPolicy: IfNotPresent
+    resources:
+      limits:
+        cpu: 100m
+        memory: 32Mi
+      requests:
+        cpu: 100m
+        memory: 10Mi
   vault:
     image:
       repository: vault
@@ -53,10 +65,6 @@ alerting:
 metrics:
   scrape_prometheus: true
   prometheus_port: 9145
-secrets:
-  vault:
-    server_tls_cert: cert
-    server_tls_key: key
-    roottoken: d435eebb-0d4c-b38f-9e19-7a074a531c2c
-configs:
-  test: a
+secretsRef: "__required__"
+pki:
+  ca_type: cfssl # can be one of "cfssl" or "k8s"

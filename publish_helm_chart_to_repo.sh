@@ -1,7 +1,7 @@
 #! /usr/bin/env bash
 
 if [ -z ${1+x} ]; then
-  echo "Usage: publish_helm.sh chart_name";
+  echo "Usage: $0 chart_name";
   exit 1
 fi
 
@@ -24,7 +24,9 @@ rm -f $PWD/$HELM_CHART_NAME/build/${HELM_CHART_NAME}-*.tgz
 # update dependencies and place them in charts/ directory
 helm dependency update $PWD/$HELM_CHART_NAME
 
-export HELM_PACKAGE_FILE=`helm package $PWD/$HELM_CHART_NAME -d $PWD/$HELM_CHART_NAME/build --debug --save=false | grep -v "Warning" | awk '{ print \$2 }'`
+export HELM_PACKAGE_FILE=`helm package $PWD/$HELM_CHART_NAME \
+                          -d $PWD/$HELM_CHART_NAME/build --debug --save=false \
+                          | grep -v "Warning" | awk '{ print \$3 }'`
 
 echo HELM_PACKAGE_FILE=$HELM_PACKAGE_FILE
 curl -i -X PUT -F repo=default -F chart=@$HELM_PACKAGE_FILE \
