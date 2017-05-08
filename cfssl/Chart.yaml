@@ -1,7 +1,7 @@
 apiVersion: v1
 description: A Helm chart for Kubernetes
 name: cfssl
-version: 0.1.90
+version: 0.1.92
 home: http://charts.downup.us/cfssl
 maintainers:
 - email: shane.ramey@gmail.com

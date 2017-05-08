@@ -7,8 +7,8 @@ spec:
     metadata:
       name: migrate
       annotations:
-        checksum/goose-config: {{ include "cfssl/templates/migrate-dbconf-template-configmap.yaml" . | sha256sum }}
-        checksum/goose-migrations: {{ include "cfssl/templates/database-migrations-configmap.yaml" . | sha256sum }}
+        checksum/goose-config: {{ include "cfssl/templates/k8s-configmap-migrate-bootstrap.yaml" . | sha256sum }}
+        checksum/goose-migrations: {{ include "cfssl/templates/k8s-configmap-cfssl-db-migrations.yaml" . | sha256sum }}
       labels:
         app: cfssl
         service: migrate
