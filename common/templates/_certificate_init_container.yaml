@@ -1,0 +1,32 @@
+{{- define "common.certificate_init_container.container" -}}
+- name: certificate-init-container
+  image: gcr.io/hightowerlabs/certificate-init-container:0.0.1
+  imagePullPolicy: IfNotPresent
+  env:
+    - name: NAMESPACE
+      valueFrom:
+        fieldRef:
+          fieldPath: metadata.namespace
+    - name: POD_NAME
+      valueFrom:
+        fieldRef:
+          fieldPath: metadata.name
+    - name: POD_IP
+      valueFrom:
+        fieldRef:
+          fieldPath: status.podIP
+  args:
+    - "-additional-dnsnames=example.com"
+    - "-cert-dir=/etc/tls"
+    - "-namespace=$(NAMESPACE)"
+    - "-pod-ip=$(POD_IP)"
+    - "-pod-name=$(POD_NAME)"
+    - "-service-names=tls-app"            
+  volumeMounts:
+    - name: certificate-init-container-workdir
+      mountPath: /etc/tls
+{{- end -}}
+{{- define "common.certificate_init_container.volume" -}}
+- name: certificate-init-container-workdir
+  emptyDir: {}
+{{- end -}}
